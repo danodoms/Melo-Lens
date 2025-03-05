@@ -1,21 +1,31 @@
 {
   "build": {
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
     "preview": {
       "android": {
         "buildType": "apk"
       }
     },
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
     "preview2": {
       "android": {
         "gradleCommand": ":app:assembleRelease"
       }
     },
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
     "preview3": {
       "developmentClient": true
     },
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
     "preview4": {
       "distribution": "internal"
     },
+    // Note: Before running `eas build`, ensure that the `android` or `ios` folder is deleted first.
     "production": {}
   }
 }
