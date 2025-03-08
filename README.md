@@ -1,7 +1,7 @@
-# 🌾 **XR Vision**  
-**AI-Powered Rice Leaf NPK Deficiency Detector**  
+# 🍉 **Melo Lens**  
+**AI-Powered Watermelon Disease Detector**  
 
-> Unlock the potential of precision agriculture with XR Vision, a cutting-edge Expo React Native app designed to analyze NPK deficiencies in rice leaves.  
+> Empower precision farming with **Melo Lens**, an Expo React Native app designed to detect diseases in watermelon leaves using AI.  
 
 ---
 
@@ -9,36 +9,39 @@
 
 ### 📊 **Home Screen**  
 - **Quick Overview**: View a preview of past analysis results.  
-- **Statistics**: See the total count of analyzed results for a snapshot of your field's health.  
+- **Statistics**: Get a summary of detected disease cases for better crop management.  
 
 ### 📸 **Scan Screen**  
 - **Capture or Import**:  
-  - Use your device camera to capture rice leaf images directly.  
-  - Alternatively, import images from your gallery for quick analysis.  
+  - Use your device camera to scan watermelon leaves.  
+  - Import images from your gallery for AI analysis.  
 
 ### 🧾 **Result Screen**  
-- **Detailed Analysis**: View all results, including NPK deficiency status and confidence levels.  
-- **Track History**: Keep a record of your analysis for future reference.  
+- **Detailed Analysis**: Displays disease classification, severity levels, and confidence scores.  
+- **Track History**: Maintain a record of previous scans to monitor disease progression.  
 
 ### 👤 **Accounts**  
 - **Login & Sync**:  
-  - Securely log in to manage your account.  
-  - Sync your data across devices for seamless access.
+  - Securely log in to manage and back up your scan history.  
+  - Sync data across devices for seamless tracking.  
 
 ---
 
 ## 🛠️ **Tech Stack**  
 
 - **Framework**: [Expo](https://expo.dev/) (React Native)  
-- **State Management**: Legend State
-- **Backend**: Supabase 
-- **Database**: MMKV Storage with Legend State
+- **State Management**: Legend State  
+- **Backend**: Supabase  
+- **Database**: MMKV Storage with Legend State  
 
 ---
 
-## 🌟 **Why XR Vision?**  
+## 🌟 **Why Melo Lens?**  
 
-- **AI-Powered Precision**: Leverages advanced models to accurately detect nitrogen (N), phosphorus (P), and potassium (K) deficiencies.  
-- **User-Friendly**: Intuitive interface designed for quick navigation.  
-- **Data Security**: Accounts feature ensures your data is safe and synced.  
-- **Offline Capability**: Analyze and store results offline, perfect for fieldwork.  
+- **AI-Powered Detection**: Uses deep learning to identify and classify watermelon diseases.  
+- **Farmer-Friendly**: Simple, intuitive design for quick and easy use in the field.  
+- **Data Security**: Secure login ensures your scan history is backed up and accessible.  
+- **Offline Mode**: Analyze and store results even without an internet connection.  
+
+---
+
