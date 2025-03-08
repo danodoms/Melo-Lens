@@ -1,8 +1,39 @@
-import React, { useState, useEffect, useRef } from "react";
+import { npkClassifierClasses } from "@/assets/model/tflite/npk-classifier/npk-classifier-classes";
+import ScanResultDrawer from "@/src/components/ScanResultDrawer";
 import {
-  loadTensorflowModel,
-  TensorflowModel,
-  useTensorflowModel,
+  Button,
+  ButtonIcon,
+  ButtonText
+} from "@/src/components/ui/button";
+import { Center } from "@/src/components/ui/center";
+import { HStack } from "@/src/components/ui/hstack";
+import { Icon } from "@/src/components/ui/icon";
+import { Text } from "@/src/components/ui/text";
+import { Toast, ToastDescription, ToastTitle, useToast } from '@/src/components/ui/toast';
+import { VStack } from "@/src/components/ui/vstack";
+import { useTfliteModel } from "@/src/hooks/useTfliteModel";
+import { globalStore } from "@/src/state/globalState";
+import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
+import { useSupabase } from "@/src/utils/useSupabase";
+import { use$ } from "@legendapp/state/react";
+import axios from 'axios';
+import { fromByteArray } from 'base64-js';
+import * as ImageManipulator from "expo-image-manipulator";
+import { SaveFormat } from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
+import {
+  Brain,
+  BrainCog,
+  ChevronUp,
+  HelpCircleIcon,
+  Images,
+  RefreshCw,
+  X
+} from "lucide-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Pressable } from "react-native";
+import {
+  loadTensorflowModel
 } from "react-native-fast-tflite";
 import {
   Camera,
@@ -10,54 +41,6 @@ import {
   useCameraPermission,
   type CameraPosition,
 } from "react-native-vision-camera";
-import {Image, Pressable, View} from "react-native";
-import { VStack } from "@/src/components/ui/vstack";
-import { Text } from "@/src/components/ui/text";
-import { plantDiseaseClasses } from "@/assets/model/tflite/plant-disease/plant-disease-classes";
-import {npkClassifierClasses} from "@/assets/model/tflite/npk-classifier/npk-classifier-classes";
-import * as ImageManipulator from "expo-image-manipulator";
-import {
-  Button,
-  ButtonText,
-  ButtonSpinner,
-  ButtonIcon,
-  ButtonGroup,
-} from "@/src/components/ui/button";
-import { SaveFormat } from "expo-image-manipulator";
-import { Box } from "@/src/components/ui/box";
-import ScanResultDrawer from "@/src/components/ScanResultDrawer";
-import { useTfliteModel } from "@/src/hooks/useTfliteModel";
-import LottieView from "lottie-react-native";
-import { saveImageToAppData } from "@/src/lib/imageUtil";
-import * as Crypto from "expo-crypto";
-import {
-  Brain,
-  BrainCircuit,
-  BrainCog,
-  ChevronUp,
-  Circle,
-  HelpCircleIcon,
-  Images,
-  RefreshCw,
-  Scan,
-  X
-} from "lucide-react-native";
-import { width } from "dom-helpers";
-import { HStack } from "@/src/components/ui/hstack";
-import {useSupaLegend} from "@/src/utils/supalegend/useSupaLegend";
-import * as ImagePicker from "expo-image-picker";
-import {Center} from "@/src/components/ui/center";
-import axios from 'axios';
-import { useToast, Toast,ToastTitle, ToastDescription } from '@/src/components/ui/toast';
-import {Icon} from "@/src/components/ui/icon"
-import blobToBase64 from 'react-native-blob-util';
-import { fromByteArray } from 'base64-js';
-import { Input, InputField, InputIcon, InputSlot } from '@/src/components/ui/input';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import {use$, useSelector} from "@legendapp/state/react";
-import { globalStore } from "@/src/state/globalState";
-import {global} from "expo-modules-core/src/ts-declarations/ExpoModules";
-import {useSupabase} from "@/src/utils/useSupabase";
 
 
 
@@ -65,9 +48,9 @@ export default function ScanScreen() {
   const {
     confidence,
     classification,
-      setClassification,
-      setConfidence,
-      resetPrediction,
+    setClassification,
+    setConfidence,
+    resetPrediction,
     isModelPredicting,
     model,
     setModel,
@@ -85,7 +68,7 @@ export default function ScanScreen() {
   const [isError, setIsError] = useState<boolean>(false);
   const [isResultSaved, setIsResultSaved] = useState<boolean>(false);
   const device = useCameraDevice(cameraFacing);
-  const[isXaiEnabled, setXaiEnabled] = useState(false);
+  const [isXaiEnabled, setXaiEnabled] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false)
 
   const backendAddress = use$(globalStore.backendAddress);
@@ -97,49 +80,49 @@ export default function ScanScreen() {
   const toast = useToast()
 
   function showNetworkErrorToast() {
-    toast.show({id: "networkErrorToast",
+    toast.show({
+      id: "networkErrorToast",
       duration: 5000,
       placement: 'top',
       onCloseComplete: undefined,
       avoidKeyboard: true,
       containerStyle: undefined,
       render: () => (
-          <Toast
-              action="error"
-              variant="outline"
-              nativeID="networkErrorToast"
-              className="p-4 gap-6 border-error-500 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
-          >
-            <HStack space="md">
-              <Icon as={HelpCircleIcon} className="stroke-error-500 mt-0.5" />
-              <VStack space="xs">
-                <ToastTitle className="font-semibold text-error-500">
-                  Error!
-                </ToastTitle>
-                <ToastDescription size="sm">
-                  Something went wrong.
-                </ToastDescription>
-              </VStack>
-            </HStack>
-            <HStack className="min-[450px]:gap-3 gap-1">
-              <Button variant="link" size="sm" className="px-3.5 self-center">
-                <ButtonText>Retry</ButtonText>
-              </Button>
-              <Pressable onPress={() => toast.close("networkErrorToast")}>
-                <Icon as={X} />
-              </Pressable>
-            </HStack>
-          </Toast>
-      ),})
+        <Toast
+          action="error"
+          variant="outline"
+          nativeID="networkErrorToast"
+          className="p-4 gap-6 border-error-500 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
+        >
+          <HStack space="md">
+            <Icon as={HelpCircleIcon} className="stroke-error-500 mt-0.5" />
+            <VStack space="xs">
+              <ToastTitle className="font-semibold text-error-500">
+                Error!
+              </ToastTitle>
+              <ToastDescription size="sm">
+                Something went wrong.
+              </ToastDescription>
+            </VStack>
+          </HStack>
+          <HStack className="min-[450px]:gap-3 gap-1">
+            <Button variant="link" size="sm" className="px-3.5 self-center">
+              <ButtonText>Retry</ButtonText>
+            </Button>
+            <Pressable onPress={() => toast.close("networkErrorToast")}>
+              <Icon as={X} />
+            </Pressable>
+          </HStack>
+        </Toast>
+      ),
+    })
   }
 
-/*const API_URL = "http://10.0.2.2:8000/generate-heatmap/";*/
-/*  const API_URL = "https://xr-vision-backend.onrender.com/generate-heatmap/";*/
   const API_URL = `https://${backendAddress}/generate-heatmap/`;
 
 
 
-  const {addResult} = useSupaLegend()
+  const { addResult } = useSupaLegend()
 
   // Ensure TensorFlow is ready before classifying
   useEffect(() => {
@@ -189,48 +172,49 @@ export default function ScanScreen() {
 
     // Resize the image to fit the model requirements
     const manipulatedImage = await ImageManipulator.manipulateAsync(
-        imageUri,
-        [{ resize: { width: 224, height: 224 } }],
-        { format: SaveFormat.JPEG, base64: true }
+      imageUri,
+      [{ resize: { width: 224, height: 224 } }],
+      { format: SaveFormat.JPEG, base64: true }
     );
     setCapturedImageUri(manipulatedImage.uri);
 
     // If XAI is disabled, use offline model prediction
-    if (!isXaiEnabled){
+    if (!isXaiEnabled) {
       runModelPrediction(manipulatedImage.uri, "float32", npkClassifierClasses);
       return
     }
 
     // Prepare the FormData to send to the API
     const formData = new FormData();
-    formData.append('file',{
+    formData.append('file', {
       uri: manipulatedImage.uri,
       name: 'image.jpg',
-      type: 'image/jpeg'});
+      type: 'image/jpeg'
+    });
 
     // Send image to API and process the response
     axios.post(API_URL, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      params: {
-          'enable_gradcam': true
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
-      responseType:"arraybuffer"
-      })
-        .then(response=>{
-          setConfidence((parseFloat(response.headers["prediction-confidence"]*100)).toFixed(2));
-          setClassification(response.headers["prediction-label"])
+      params: {
+        'enable_gradcam': true
+      },
+      responseType: "arraybuffer"
+    })
+      .then(response => {
+        setConfidence((parseFloat(response.headers["prediction-confidence"] * 100)).toFixed(2));
+        setClassification(response.headers["prediction-label"])
 
-          const bytes = new Uint8Array(response.data);
-          const base64String = fromByteArray(bytes);
-          const imageUri = `data:image/jpeg;base64,${base64String}`;
-          setXaiHeatmapUri(imageUri);
-        })
-        .catch(error=>{
-          console.error("Error calling XAI API:", error);
-          showNetworkErrorToast()
-        });
+        const bytes = new Uint8Array(response.data);
+        const base64String = fromByteArray(bytes);
+        const imageUri = `data:image/jpeg;base64,${base64String}`;
+        setXaiHeatmapUri(imageUri);
+      })
+      .catch(error => {
+        console.error("Error calling XAI API:", error);
+        showNetworkErrorToast()
+      });
 
 
 
@@ -296,41 +280,41 @@ export default function ScanScreen() {
   function RenderButtonComponent() {
 
     return (
-        <VStack className="p-4">
+      <VStack className="p-4">
 
-          <HStack className="gap-4 mb-8 flex justify-center items-center w-full ">
-            <Button
-                size="md"
-                variant={isXaiEnabled ? "solid" : "outline"}
-                className="rounded-full"
-                onPress={() => setXaiEnabled(!isXaiEnabled)}
-            >
-              <ButtonText>{isXaiEnabled ? "Disable XAI" : "Enable XAI"}</ButtonText>
-              <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} />
-            </Button>
+        <HStack className="gap-4 mb-8 flex justify-center items-center w-full ">
+          <Button
+            size="md"
+            variant={isXaiEnabled ? "solid" : "outline"}
+            className="rounded-full"
+            onPress={() => setXaiEnabled(!isXaiEnabled)}
+          >
+            <ButtonText>{isXaiEnabled ? "Disable XAI" : "Enable XAI"}</ButtonText>
+            <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} />
+          </Button>
 
-            <Button size="md" variant="solid" className="rounded-full" onPress={()=>setDrawerOpen(true)}>
-              {/*<ButtonText >Show Drawer</ButtonText>*/}
-              <ButtonIcon as={ChevronUp} />
-            </Button>
-          </HStack>
+          <Button size="md" variant="solid" className="rounded-full" onPress={() => setDrawerOpen(true)}>
+            {/*<ButtonText >Show Drawer</ButtonText>*/}
+            <ButtonIcon as={ChevronUp} />
+          </Button>
+        </HStack>
 
-          <HStack className="mb-4 flex justify-evenly items-center border-red-500">
-            <Button size="xl" variant="solid" className="rounded-full p-4" onPress={importImageAndClassify} >
-              <ButtonIcon size="xl" as={Images} />
-            </Button>
+        <HStack className="mb-4 flex justify-evenly items-center border-red-500">
+          <Button size="xl" variant="solid" className="rounded-full p-4" onPress={importImageAndClassify} >
+            <ButtonIcon size="xl" as={Images} />
+          </Button>
 
-            <Pressable onPress={captureAndClassify}>
-              <Center className="size-20 rounded-full border-4 border-white">
-                <Center className="size-16 rounded-full bg-white opacity-20"/>
-              </Center>
-            </Pressable>
+          <Pressable onPress={captureAndClassify}>
+            <Center className="size-20 rounded-full border-4 border-white">
+              <Center className="size-16 rounded-full bg-white opacity-20" />
+            </Center>
+          </Pressable>
 
-            <Button size="xl"  variant="solid" className="rounded-full p-4" onPress={toggleCameraFacing}>
-              <ButtonIcon size="xl" as={RefreshCw} />
-            </Button>
-          </HStack>
-        </VStack>
+          <Button size="xl" variant="solid" className="rounded-full p-4" onPress={toggleCameraFacing}>
+            <ButtonIcon size="xl" as={RefreshCw} />
+          </Button>
+        </HStack>
+      </VStack>
     );
   }
 
@@ -350,7 +334,7 @@ export default function ScanScreen() {
         isActive={true}
         ref={cameraRef}
         photo={true}
-        /*  frameProcessor={frameProcessor}*/
+      /*  frameProcessor={frameProcessor}*/
       />
 
       {/*FOR DEVELOPERS*/}

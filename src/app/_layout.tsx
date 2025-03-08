@@ -14,7 +14,7 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {globalStore} from "@/src/state/globalState";
+import { globalStore } from "@/src/state/globalState";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
