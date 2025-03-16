@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerBackdrop,
@@ -16,8 +16,10 @@ import { Skeleton, SkeletonText } from "@/src/components/ui/skeleton";
 import { VStack } from "@/src/components/ui/vstack";
 import { Box } from "@/src/components/ui/box";
 import LottieView from "lottie-react-native";
-import {Pressable, StyleSheet} from "react-native";
-import {Center} from "@/src/components/ui/center";
+import { Pressable, StyleSheet } from "react-native";
+import { Center } from "@/src/components/ui/center";
+import { getAiResult } from "../lib/ai/open-router";
+import { getCompletion, getStreamingCompletion } from "../lib/ai/fetch";
 
 interface ScanResultDrawerProps {
   drawerState: {
@@ -25,7 +27,7 @@ interface ScanResultDrawerProps {
     isError: boolean;
     setDrawerOpen: (open: boolean) => void;
     saveResultCallback: () => void;
-    isResultSaved:boolean;
+    isResultSaved: boolean;
     imageUri: string | null;
     xaiHeatmapUri: string | null;
     classification: string | null;
@@ -35,27 +37,27 @@ interface ScanResultDrawerProps {
 
 type ConfidenceRemark = "Weak" | "Moderate" | "Strong"
 
-function renderConfidenceRemark(confidence:number):ConfidenceRemark{
-  if(confidence >= 90) return "Strong";
-  if(confidence >= 70 && confidence <=89) return "Moderate";
+function renderConfidenceRemark(confidence: number): ConfidenceRemark {
+  if (confidence >= 90) return "Strong";
+  if (confidence >= 70 && confidence <= 89) return "Moderate";
   return "Weak"
 }
 
 function renderSaveResultComponent(saveResultCallback: () => void, isResultSaved: boolean) {
-  if(isResultSaved) {
-    return(
-        <Button className="flex-1" variant='outline' >
-          <ButtonText>Result Saved</ButtonText>
-        </Button>
-        )
+  if (isResultSaved) {
+    return (
+      <Button className="flex-1" variant='outline' >
+        <ButtonText>Result Saved</ButtonText>
+      </Button>
+    )
   }
 
-  return(
+  return (
     <Button
-        onPress={() => {
-          saveResultCallback();
-        }}
-        className="flex-1"
+      onPress={() => {
+        saveResultCallback();
+      }}
+      className="flex-1"
     >
       <ButtonText>Save and close</ButtonText>
     </Button>
@@ -67,8 +69,8 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
   const [isXaiHeatmapShown, setXaiHeatmapShown] = useState(false);
   const isPredictionDone = drawerState.classification && drawerState.confidence && drawerState.imageUri;
 
-  function handleSetXaiHeatmapShown(){
-    if(drawerState.xaiHeatmapUri){
+  function handleSetXaiHeatmapShown() {
+    if (drawerState.xaiHeatmapUri) {
       setXaiHeatmapShown(!isXaiHeatmapShown);
     }
   }
@@ -107,42 +109,56 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
             <Center className="border-green-500 min-w-full">
               <Pressable onPress={handleSetXaiHeatmapShown}>
                 <Image
-                    size="2xl"
+                  size="2xl"
                   className=" rounded-md min-w-full"
                   alt="classification-image"
                   source={{
-                    uri:  isXaiHeatmapShown && drawerState.xaiHeatmapUri ? drawerState.xaiHeatmapUri : drawerState.imageUri,
+                    uri: isXaiHeatmapShown && drawerState.xaiHeatmapUri ? drawerState.xaiHeatmapUri : drawerState.imageUri,
                   }}
                 />
 
                 {!isPredictionDone && (
-                    <LottieView
-                        style={styles.animation}
-                        source={require("@/assets/animations/scan-animation.json")}
-                        autoPlay
-                        loop
-                    />
+                  <LottieView
+                    style={styles.animation}
+                    source={require("@/assets/animations/scan-animation.json")}
+                    autoPlay
+                    loop
+                  />
                 )}
 
                 {drawerState.xaiHeatmapUri && (
-                    <Text className="mt-2 opacity-50 text-center">
-                      {isXaiHeatmapShown ? ("Tap to view original Image") : ("Tap to view XAI Heatmap")}
-                    </Text>
+                  <Text className="mt-2 opacity-50 text-center">
+                    {isXaiHeatmapShown ? ("Tap to view original Image") : ("Tap to view XAI Heatmap")}
+                  </Text>
                 )}
               </Pressable>
             </Center>
           ) : (
-              <>
-                <Skeleton variant="rounded" className="h-full w-full border  " />
-              </>
+            <>
+              <Skeleton variant="rounded" className="h-full w-full border  " />
+            </>
           )}
+
+
+          <Button
+            onPress={() => {
+              console.log("fetchingggg")
+              // getStreamingCompletion("Explain quantum physics", (text) => {
+              //   console.log("Stream:", text);
+              // });
+              getCompletion()
+            }}
+            className="flex-1"
+          >
+            <ButtonText>AI Assist</ButtonText>
+          </Button>
         </DrawerBody>
 
         {drawerState.confidence && drawerState.classification && drawerState.imageUri && (
-            <DrawerFooter>
-              {renderSaveResultComponent(drawerState.saveResultCallback, drawerState.isResultSaved)}
-            </DrawerFooter>
-        ) }
+          <DrawerFooter>
+            {renderSaveResultComponent(drawerState.saveResultCallback, drawerState.isResultSaved)}
+          </DrawerFooter>
+        )}
 
       </DrawerContent>
     </Drawer>

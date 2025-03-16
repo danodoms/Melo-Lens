@@ -1,4 +1,4 @@
-import { npkClassifierClasses } from "@/assets/model/tflite/npk-classifier/npk-classifier-classes";
+import { melonDiseaseClasses } from "@/assets/model/tflite/melon-disease/melon-disease-classes";
 import ScanResultDrawer from "@/src/components/ScanResultDrawer";
 import {
   Button,
@@ -134,7 +134,7 @@ export default function ScanScreen() {
 
   const loadModel = async () => {
     const tfliteModel = await loadTensorflowModel(
-      require("@/assets/model/tflite/npk-classifier/npk-classifier-v3.tflite")
+      require("@/assets/model/tflite/melon-disease/melon-disease-v2.tflite")
     );
     setModel(tfliteModel);
   };
@@ -173,14 +173,14 @@ export default function ScanScreen() {
     // Resize the image to fit the model requirements
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       imageUri,
-      [{ resize: { width: 224, height: 224 } }],
+      [{ resize: { width: 128, height: 128 } }],
       { format: SaveFormat.JPEG, base64: true }
     );
     setCapturedImageUri(manipulatedImage.uri);
 
     // If XAI is disabled, use offline model prediction
     if (!isXaiEnabled) {
-      runModelPrediction(manipulatedImage.uri, "float32", npkClassifierClasses);
+      runModelPrediction(manipulatedImage.uri, "float32", melonDiseaseClasses);
       return
     }
 

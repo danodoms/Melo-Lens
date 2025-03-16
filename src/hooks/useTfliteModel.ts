@@ -1,7 +1,5 @@
-import { useRef, useState } from "react";
-import { plantDiseaseClasses } from "@/assets/model/tflite/plant-disease/plant-disease-classes";
+import { useState } from "react";
 import { TensorflowModel } from "react-native-fast-tflite";
-import { Camera } from "react-native-vision-camera";
 import { convertToRGB } from "react-native-image-to-rgb";
 
 type imageDataType = "uint8" | "float32";
@@ -19,13 +17,10 @@ export function useTfliteModel() {
   // Reference to the loaded TensorFlow Lite model
   const [model, setModel] = useState<TensorflowModel | null>(null);
 
-
-
-
-  const resetPrediction = ()=>{
+  const resetPrediction = () => {
     setConfidence(null);
     setClassification(null);
-  }
+  };
 
   /**
    * Runs the model prediction on a provided image.
@@ -39,9 +34,9 @@ export function useTfliteModel() {
    * @param outputClasses - The mapping of model output indices to class names.
    */
   const runModelPrediction = (
-      imageUri: string,
-      dataType: imageDataType,
-      outputClasses: object
+    imageUri: string,
+    dataType: imageDataType,
+    outputClasses: object
   ) => {
     if (!model) return console.log("Model is not ready");
 
@@ -52,24 +47,24 @@ export function useTfliteModel() {
 
     // Step 1: Convert the image to a suitable tensor format
     convertImageToRgb(imageUri, dataType)
-        .then((imageTensor) => {
-          console.log("Starting Classification");
+      .then((imageTensor) => {
+        console.log("Starting Classification");
 
-          // Step 2: Run the model on the image tensor
-          return model.run([imageTensor]);
-        })
-        .then((prediction) => {
-          setIsModelPredicting(false);
+        // Step 2: Run the model on the image tensor
+        return model.run([imageTensor]);
+      })
+      .then((prediction) => {
+        setIsModelPredicting(false);
 
-          // Step 3: Perform classification using the model output
-          return performClassification(prediction[0], outputClasses);
-        })
-        .then(() => {
-          console.log("Done, Image Classified");
-        })
-        .catch((error) => {
-          console.error("Error during classification:", error);
-        });
+        // Step 3: Perform classification using the model output
+        return performClassification(prediction[0], outputClasses);
+      })
+      .then(() => {
+        console.log("Done, Image Classified");
+      })
+      .catch((error) => {
+        console.error("Error during classification:", error);
+      });
   };
 
   /**
@@ -80,8 +75,8 @@ export function useTfliteModel() {
    * @returns A promise that resolves to a typed array representing the image tensor.
    */
   const convertImageToRgb = async (
-      imageUri: string,
-      format: imageDataType
+    imageUri: string,
+    format: imageDataType
   ): Promise<Float32Array | Uint8Array> => {
     try {
       // Step 1: Convert image to a flat RGB array
@@ -90,7 +85,7 @@ export function useTfliteModel() {
       // Validate the array for correctness
       if (!Array.isArray(convertedArray) || convertedArray.length % 3 !== 0) {
         throw new Error(
-            "Invalid RGB array. The input array length must be divisible by 3."
+          "Invalid RGB array. The input array length must be divisible by 3."
         );
       }
 
@@ -100,9 +95,9 @@ export function useTfliteModel() {
 
       for (let i = 0; i < convertedArray.length; i += 3) {
         finalArray.push(
-            normalizeValue(convertedArray[i]), // Red
-            normalizeValue(convertedArray[i + 1]), // Green
-            normalizeValue(convertedArray[i + 2]) // Blue
+          normalizeValue(convertedArray[i]), // Red
+          normalizeValue(convertedArray[i + 1]), // Green
+          normalizeValue(convertedArray[i + 2]) // Blue
         );
 
         // Yield control periodically to prevent blocking
@@ -132,8 +127,8 @@ export function useTfliteModel() {
    * @param outputClasses - The mapping of model output indices to class names.
    */
   const performClassification = (
-      outputs: Record<any, any>,
-      outputClasses: Record<any, any>
+    outputs: Record<any, any>,
+    outputClasses: Record<any, any>
   ) => {
     const result = getMaxClassification(outputs, outputClasses);
 
@@ -150,12 +145,12 @@ export function useTfliteModel() {
    * @returns An object containing the class name and its confidence value.
    */
   const getMaxClassification = (
-      outputs: Record<any, any>,
-      outputClasses: Record<any, any>
+    outputs: Record<any, any>,
+    outputClasses: Record<any, any>
   ) => {
     // Step 1: Find the key corresponding to the maximum output value
     const maxKey = Object.keys(outputs).reduce((a, b) =>
-        outputs[a] > outputs[b] ? a : b
+      outputs[a] > outputs[b] ? a : b
     );
 
     // Step 2: Retrieve the maximum value and associated class name

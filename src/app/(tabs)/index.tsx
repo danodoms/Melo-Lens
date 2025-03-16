@@ -3,15 +3,15 @@ import { Dimensions, Pressable } from "react-native";
 import { Text } from "@/src/components/ui/text";
 
 import {
-    Bot,
-    ChartScatter,
-    Leaf,
-    Scan,
-    Circle,
-    Sparkles,
-    Sparkle,
-    Image as ImageLucide,
-    GalleryHorizontal, UserRound,
+  Bot,
+  ChartScatter,
+  Leaf,
+  Scan,
+  Circle,
+  Sparkles,
+  Sparkle,
+  Image as ImageLucide,
+  GalleryHorizontal, UserRound,
 } from "lucide-react-native";
 import { VStack } from "@/src/components/ui/vstack";
 import { Box } from "@/src/components/ui/box";
@@ -44,7 +44,7 @@ import { Center } from "@/src/components/ui/center";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { Link } from "expo-router";
-import {Icon} from "@/src/components/ui/icon"
+import { Icon } from "@/src/components/ui/icon"
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -58,7 +58,7 @@ export default function HomeScreen() {
       <HStack className=" rounded-md mb-4 justify-between flex">
         <HStack className="gap-1">
           <Heading className="flex flex-auto" size="3xl">
-            XR Vision
+            Melo Lens
           </Heading>
           <Sparkle color="white" className="size-xs" />
         </HStack>
@@ -66,7 +66,7 @@ export default function HomeScreen() {
         <Link href="/screens/account">
           <Avatar size="md" className="flex">
 
-              <Icon as={UserRound} className="text-background-0"></Icon>
+            <Icon as={UserRound} className="text-background-0"></Icon>
             {/*<AvatarFallbackText>John Doe</AvatarFallbackText>*/}
             {/*<AvatarImage
               source={{
