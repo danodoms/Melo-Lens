@@ -2,57 +2,7 @@ import axios from "axios";
 
 const API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY as string;
 
-const model = "open-r1/olympiccoder-7b:free";
-
-// export async function getStreamingCompletion(callback: (text: string) => void) {
-//   try {
-//     const response = await fetch(
-//       "https://openrouter.ai/api/v1/chat/completions",
-//       {
-//         method: "POST",
-//         headers: {
-//           Authorization: `Bearer ${API_KEY}`,
-//           "HTTP-Referer": "<YOUR_SITE_URL>", // Optional
-//           "X-Title": "<YOUR_SITE_NAME>", // Optional
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           model,
-//           stream: true, // ✅ Enables streaming
-//           messages: [
-//             {
-//               role: "user",
-//               content: "list watermelon disease, very concise manner",
-//             },
-//           ],
-//         }),
-//       }
-//     );
-
-//     if (!response.ok || !response.body) {
-//       throw new Error("Failed to receive response from API");
-//     }
-
-//     const reader = response.body.getReader();
-//     const decoder = new TextDecoder();
-//     let accumulatedText = "";
-
-//     while (true) {
-//       const { value, done } = await reader.read();
-//       if (done) break; // End of stream
-
-//       const chunk = decoder.decode(value, { stream: true });
-//       accumulatedText += chunk;
-
-//       // ✅ Process and send partial results using callback
-//       callback(chunk);
-//     }
-
-//     return accumulatedText; // Returns full streamed text
-//   } catch (error) {
-//     console.error("Streaming Error:", error);
-//   }
-// }
+const model = "google/gemma-2-9b-it:free";
 
 export async function getStreamingCompletion(
   userMessage: string,
@@ -120,7 +70,7 @@ export async function getCompletion() {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "google/gemma-2-9b-it:free",
+        model,
         messages: [
           {
             role: "user",

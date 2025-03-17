@@ -20,6 +20,18 @@ import { Pressable, StyleSheet } from "react-native";
 import { Center } from "@/src/components/ui/center";
 import { getAiResult } from "../lib/ai/open-router";
 import { getCompletion, getStreamingCompletion } from "../lib/ai/fetch";
+import { HStack } from "./ui/hstack";
+import {
+  Bot,
+  ChartScatter,
+  Leaf,
+  Scan,
+  Circle,
+  Sparkles,
+  Sparkle,
+  Image as ImageLucide,
+  GalleryHorizontal, UserRound,
+} from "lucide-react-native";
 
 interface ScanResultDrawerProps {
   drawerState: {
@@ -66,12 +78,12 @@ function renderSaveResultComponent(saveResultCallback: () => void, isResultSaved
 
 
 const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
-  const [isXaiHeatmapShown, setXaiHeatmapShown] = useState(false);
+  const [isXaiHeatmapShown, setIsXaiHeatmapShown] = useState(false);
   const isPredictionDone = drawerState.classification && drawerState.confidence && drawerState.imageUri;
 
   function handleSetXaiHeatmapShown() {
     if (drawerState.xaiHeatmapUri) {
-      setXaiHeatmapShown(!isXaiHeatmapShown);
+      setIsXaiHeatmapShown(!isXaiHeatmapShown);
     }
   }
 
@@ -81,7 +93,7 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
       onClose={() => {
         drawerState.setDrawerOpen(false);
       }}
-      size="md"
+      size="lg"
       anchor="bottom"
     >
       <DrawerBackdrop />
@@ -118,12 +130,17 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
                 />
 
                 {!isPredictionDone && (
-                  <LottieView
-                    style={styles.animation}
-                    source={require("@/assets/animations/scan-animation.json")}
-                    autoPlay
-                    loop
-                  />
+                  <>
+                    <LottieView
+                      style={styles.animation}
+                      source={require("@/assets/animations/scan-animation.json")}
+                      autoPlay
+                      loop
+                    />
+
+
+                  </>
+
                 )}
 
                 {drawerState.xaiHeatmapUri && (
@@ -132,26 +149,14 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
                   </Text>
                 )}
               </Pressable>
+
+              {renderAiPrompts()}
+
+
             </Center>
           ) : (
-            <>
-              <Skeleton variant="rounded" className="h-full w-full border  " />
-            </>
+            <Skeleton variant="rounded" className="h-full w-full border  " />
           )}
-
-
-          <Button
-            onPress={() => {
-              console.log("fetchingggg")
-              // getStreamingCompletion("Explain quantum physics", (text) => {
-              //   console.log("Stream:", text);
-              // });
-              getCompletion()
-            }}
-            className="flex-1"
-          >
-            <ButtonText>AI Assist</ButtonText>
-          </Button>
         </DrawerBody>
 
         {drawerState.confidence && drawerState.classification && drawerState.imageUri && (
@@ -164,6 +169,63 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
     </Drawer>
   );
 };
+
+
+const renderAiPrompts = () => {
+  return (
+    <VStack className="w-full mt-8">
+
+
+      <HStack className="gap-2 items-center opacity-50">
+        <Bot color="white" className="size-sm" />
+        <Text className="font-bold">AI Responses</Text>
+      </HStack>
+
+      <Button
+        variant="link"
+        onPress={() => {
+          console.log("fetchingggg")
+          // getStreamingCompletion("Explain quantum physics", (text) => {
+          //   console.log("Stream:", text);
+          // });
+          getCompletion()
+        }}
+        className="flex-1 w-full justify-start"
+      >
+        <ButtonText >What are the possible treatments?</ButtonText>
+      </Button>
+
+      <Button
+        variant="link"
+        onPress={() => {
+          console.log("fetchingggg")
+          // getStreamingCompletion("Explain quantum physics", (text) => {
+          //   console.log("Stream:", text);
+          // });
+          getCompletion()
+        }}
+        className="flex-1 w-full justify-start"
+      >
+        <ButtonText>How bad is this, and what should I expect?</ButtonText>
+      </Button>
+
+
+      <Button
+        variant="link"
+        onPress={() => {
+          console.log("fetchingggg")
+          // getStreamingCompletion("Explain quantum physics", (text) => {
+          //   console.log("Stream:", text);
+          // });
+          getCompletion()
+        }}
+        className="flex-1 w-full justify-start"
+      >
+        <ButtonText>How can I avoid this in the future?</ButtonText>
+      </Button>
+    </VStack>
+  )
+}
 
 const styles = StyleSheet.create({
   animation: {
