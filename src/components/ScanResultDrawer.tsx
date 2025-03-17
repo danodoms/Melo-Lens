@@ -18,7 +18,6 @@ import { Box } from "@/src/components/ui/box";
 import LottieView from "lottie-react-native";
 import { Pressable, StyleSheet } from "react-native";
 import { Center } from "@/src/components/ui/center";
-import { getAiResult } from "../lib/ai/open-router";
 import { getCompletion, getStreamingCompletion } from "../lib/ai/fetch";
 import { HStack } from "./ui/hstack";
 import {
@@ -32,19 +31,24 @@ import {
   Image as ImageLucide,
   GalleryHorizontal, UserRound,
 } from "lucide-react-native";
+import { set } from "zod";
+import Markdown from "react-native-markdown-display";
+
+
+interface DrawerState {
+  isDrawerOpen: boolean;
+  isError: boolean;
+  setDrawerOpen: (open: boolean) => void;
+  saveResultCallback: () => void;
+  isResultSaved: boolean;
+  imageUri: string | null;
+  xaiHeatmapUri: string | null;
+  classification: string | null;
+  confidence: number | null;
+}
 
 interface ScanResultDrawerProps {
-  drawerState: {
-    isDrawerOpen: boolean;
-    isError: boolean;
-    setDrawerOpen: (open: boolean) => void;
-    saveResultCallback: () => void;
-    isResultSaved: boolean;
-    imageUri: string | null;
-    xaiHeatmapUri: string | null;
-    classification: string | null;
-    confidence: number | null;
-  };
+  drawerState: DrawerState
 }
 
 type ConfidenceRemark = "Weak" | "Moderate" | "Strong"
@@ -77,7 +81,10 @@ function renderSaveResultComponent(saveResultCallback: () => void, isResultSaved
 }
 
 
+
+
 const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
+  const [aiResponse, setAiResponse] = useState<string>("test");
   const [isXaiHeatmapShown, setIsXaiHeatmapShown] = useState(false);
   const isPredictionDone = drawerState.classification && drawerState.confidence && drawerState.imageUri;
 
@@ -130,17 +137,12 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
                 />
 
                 {!isPredictionDone && (
-                  <>
-                    <LottieView
-                      style={styles.animation}
-                      source={require("@/assets/animations/scan-animation.json")}
-                      autoPlay
-                      loop
-                    />
-
-
-                  </>
-
+                  <LottieView
+                    style={styles.animation}
+                    source={require("@/assets/animations/scan-animation.json")}
+                    autoPlay
+                    loop
+                  />
                 )}
 
                 {drawerState.xaiHeatmapUri && (
@@ -150,7 +152,16 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
                 )}
               </Pressable>
 
-              {renderAiPrompts()}
+              {renderAiPrompts({ drawerState, setAiResponse })}
+
+              <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
+                {/* <Text className="font-bold">AI Response</Text> */}
+                <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
+                  {/* <Text> */}
+                  {aiResponse.trim()}
+                  {/* </Text> */}
+                </Markdown>
+              </Box>
 
 
             </Center>
@@ -171,10 +182,21 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
 };
 
 
-const renderAiPrompts = () => {
+
+
+const renderAiPrompts = ({ drawerState, setAiResponse }: { drawerState: DrawerState, setAiResponse: (response: string) => void }) => {
+
+  const promptPrefix = "In a concise manner,";
+
+  const handleAiPrompt = async (prompt: string) => {
+    console.log("fetchingggg")
+    const response = await getCompletion(prompt);
+    setAiResponse(response)
+  }
+
+
   return (
     <VStack className="w-full mt-8">
-
 
       <HStack className="gap-2 items-center opacity-50">
         <Bot color="white" className="size-sm" />
@@ -184,11 +206,7 @@ const renderAiPrompts = () => {
       <Button
         variant="link"
         onPress={() => {
-          console.log("fetchingggg")
-          // getStreamingCompletion("Explain quantum physics", (text) => {
-          //   console.log("Stream:", text);
-          // });
-          getCompletion()
+          handleAiPrompt(`${promptPrefix} what are the possible treatments for ${drawerState.classification}?`)
         }}
         className="flex-1 w-full justify-start"
       >
@@ -198,11 +216,7 @@ const renderAiPrompts = () => {
       <Button
         variant="link"
         onPress={() => {
-          console.log("fetchingggg")
-          // getStreamingCompletion("Explain quantum physics", (text) => {
-          //   console.log("Stream:", text);
-          // });
-          getCompletion()
+          handleAiPrompt(`${promptPrefix} how bad is Watermelon ${drawerState.classification}, and what should i expect?`)
         }}
         className="flex-1 w-full justify-start"
       >
@@ -213,11 +227,7 @@ const renderAiPrompts = () => {
       <Button
         variant="link"
         onPress={() => {
-          console.log("fetchingggg")
-          // getStreamingCompletion("Explain quantum physics", (text) => {
-          //   console.log("Stream:", text);
-          // });
-          getCompletion()
+          handleAiPrompt(`${promptPrefix} How can I avoid ${drawerState.classification} in the future?`)
         }}
         className="flex-1 w-full justify-start"
       >

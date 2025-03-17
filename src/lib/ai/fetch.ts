@@ -65,7 +65,7 @@ export async function getStreamingCompletion(
   }
 }
 
-export async function getCompletion() {
+export async function getCompletion(prompt: string) {
   try {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -74,7 +74,7 @@ export async function getCompletion() {
         messages: [
           {
             role: "user",
-            content: "List watermelon diseases, very concise manner.",
+            content: prompt,
           },
         ],
       },
@@ -87,6 +87,8 @@ export async function getCompletion() {
     );
 
     console.log(response.data.choices[0].message.content);
+
+    return response.data.choices[0].message.content;
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
   }
