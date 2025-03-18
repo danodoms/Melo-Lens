@@ -14,7 +14,8 @@ import { VStack } from "@/src/components/ui/vstack";
 import { RenderAiPrompts } from "./ai-prompts";
 import { renderSaveResultComponent } from "./save-result-button";
 import { renderConfidenceRemark } from "./confidence-remark";
-import { MoveLeft } from "lucide-react-native";
+import { Bot, MoveLeft } from "lucide-react-native";
+import { HStack } from "../ui/hstack";
 
 export type DrawerState = {
     isDrawerOpen: boolean;
@@ -64,42 +65,7 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
 
                 {/* Render AI Response Page if it's shown */}
                 {isAiPageShown ? (
-                    <>
-                        <DrawerHeader>
-                            <VStack>
-                                <Heading size="xl" className="text-end">
-                                    {drawerState.classification}
-                                </Heading>
-                                <Text className="text-typography-400">
-                                    {drawerState.confidence}% {renderConfidenceRemark(drawerState.confidence ?? 0)} Confidence
-                                </Text>
-                            </VStack>
-
-                            <Button onPress={() => setIsAiPageShown(false)} className="">
-                                <ButtonIcon as={MoveLeft} />
-                            </Button>
-                        </DrawerHeader>
-                        <DrawerBody>
-                            <Text>
-                                {aiSession.prompt}
-                            </Text>
-                            <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
-                                <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
-                                    {aiSession.response.trim()}
-                                </Markdown>
-                            </Box>
-
-                            {/* AI Response Trigger */}
-                            {RenderAiPrompts({
-                                drawerState,
-                                setAiSession: (aiSession: AiSession) => {
-                                    setAiSession({ prompt: aiSession.prompt, response: "" });
-                                    setIsAiPageShown(true);
-                                    setAiSession(aiSession);
-                                }
-                            })}
-                        </DrawerBody>
-                    </>
+                    <AiResponseView drawerState={drawerState} aiSession={aiSession} onBack={() => setIsAiPageShown(false)} />
                 ) : (
                     <>
                         <DrawerHeader>
@@ -157,14 +123,16 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
                             )}
                         </DrawerBody>
 
-                        {canSaveResult && (
-                            <DrawerFooter>
-                                {renderSaveResultComponent(drawerState.saveResultCallback, drawerState.isResultSaved)}
-                            </DrawerFooter>
-                        )}
+                        {
+                            canSaveResult && (
+                                <DrawerFooter>
+                                    {renderSaveResultComponent(drawerState.saveResultCallback, drawerState.isResultSaved)}
+                                </DrawerFooter>
+                            )
+                        }
                     </>
                 )}
-            </DrawerContent>
+            </DrawerContent >
         </Drawer >
     );
 };
@@ -179,5 +147,44 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
     },
 });
+
+
+type AiResponseViewProps = {
+    drawerState: DrawerState;
+    aiSession: AiSession;
+    onBack: () => void;
+};
+
+const AiResponseView: React.FC<AiResponseViewProps> = ({ drawerState, aiSession, onBack }) => (
+    <>
+        <DrawerHeader className="flex flex-wrap gap-2 items-center  border-red-500">
+
+            <VStack className="">
+                <HStack className="gap-2 items-center opacity-50">
+                    <Bot color="white" className="size-sm" />
+                    <Text className="font-bold">Ask AI</Text>
+                </HStack>
+
+                <Heading size="lg" className="">
+                    {aiSession.prompt}
+                </Heading>
+            </VStack>
+
+
+            <Button onPress={onBack} className="">
+                <ButtonIcon as={MoveLeft} />
+                <ButtonText>Back</ButtonText>
+            </Button>
+        </DrawerHeader>
+        <DrawerBody>
+            {/* <Text>{aiSession.prompt}</Text> */}
+            <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
+                <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
+                    {aiSession.response.trim()}
+                </Markdown>
+            </Box>
+        </DrawerBody>
+    </>
+);
 
 export default ScanResultDrawer;
