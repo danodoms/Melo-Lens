@@ -4,14 +4,18 @@ import { Button, ButtonText } from "@/src/components/ui/button";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { HStack } from "@/src/components/ui/hstack";
-import { getCompletion } from "../../lib/ai/fetch";
-import { AiSession } from "./index";
+import { getAiResponse } from "../../lib/ai/fetch";
+import { AiSession, DrawerState } from "./index";
 
 
 
+type RenderAiPromptsProps = {
+    drawerState: DrawerState;
+    setAiSession: (aiSession: AiSession) => void;
+};
 
 
-export const RenderAiPrompts = ({ drawerState, setAiSession }: { drawerState: any, setAiSession: (aiSession: AiSession) => void }) => {
+export const RenderAiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSession }) => {
 
     const prompts = [
         "What are the possible treatments?",
@@ -19,13 +23,15 @@ export const RenderAiPrompts = ({ drawerState, setAiSession }: { drawerState: an
         "How can I avoid this in the future?"
     ]
 
-    const generatePrompt = (prompt: string) => {
-        const promptPrefix = "In a concise manner,";
-        return `${promptPrefix} ${prompt} for watermelon ${drawerState.classification}`;
-    }
 
     const handleAiPrompt = async (prompt: string) => {
-        const response = await getCompletion(prompt);
+        function generatePrompt(prompt: string) {
+            const promptPrefix = "In a concise manner,";
+            return `${promptPrefix} ${prompt} for watermelon ${drawerState.classification}`;
+        }
+
+        const response = await getAiResponse(generatePrompt(prompt));
+
         setAiSession({ prompt, response });
     };
 
@@ -39,7 +45,7 @@ export const RenderAiPrompts = ({ drawerState, setAiSession }: { drawerState: an
             </HStack>
 
             {prompts.map((prompt, index) =>
-                <Button variant="link" key={prompt + index} onPress={() => handleAiPrompt(generatePrompt(prompt))} className="flex-1 w-full justify-start">
+                <Button variant="link" key={prompt + index} onPress={() => handleAiPrompt(prompt)} className="flex-1 w-full justify-start">
                     <ButtonText>{prompt}</ButtonText>
                 </Button>
             )}

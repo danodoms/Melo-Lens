@@ -21,7 +21,7 @@ import {
 import React, { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
-import { getCompletion } from "../../lib/ai/fetch";
+import { getAiResponse } from "../../lib/ai/fetch";
 import { HStack } from "../ui/hstack";
 
 
@@ -180,7 +180,7 @@ const renderAiPrompts = ({ drawerState, setAiResponse }: { drawerState: DrawerSt
 
   const handleAiPrompt = async (prompt: string) => {
     console.log("fetchingggg")
-    const response = await getCompletion(prompt);
+    const response = await getAiResponse(prompt);
     setAiResponse(response)
   }
 

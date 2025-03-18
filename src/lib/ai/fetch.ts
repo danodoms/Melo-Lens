@@ -65,7 +65,7 @@ export async function getStreamingCompletion(
   }
 }
 
-export async function getCompletion(prompt: string) {
+export async function getAiResponse(prompt: string) {
   try {
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -86,7 +86,7 @@ export async function getCompletion(prompt: string) {
       }
     );
 
-    console.log(response.data.choices[0].message.content);
+    // console.log(response.data.choices[0].message.content);
 
     return response.data.choices[0].message.content;
   } catch (error) {
