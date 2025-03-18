@@ -1,38 +1,28 @@
-import React, { useEffect, useState } from "react";
+import { Box } from "@/src/components/ui/box";
+import { Button, ButtonText } from "@/src/components/ui/button";
+import { Center } from "@/src/components/ui/center";
 import {
   Drawer,
   DrawerBackdrop,
-  DrawerContent,
-  DrawerHeader,
-  DrawerCloseButton,
   DrawerBody,
+  DrawerContent,
   DrawerFooter,
+  DrawerHeader
 } from "@/src/components/ui/drawer";
-import { Button, ButtonText } from "@/src/components/ui/button";
 import { Heading } from "@/src/components/ui/heading";
-import { Text } from "@/src/components/ui/text";
 import { Image } from "@/src/components/ui/image";
 import { Skeleton, SkeletonText } from "@/src/components/ui/skeleton";
+import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
-import { Box } from "@/src/components/ui/box";
 import LottieView from "lottie-react-native";
-import { Pressable, StyleSheet } from "react-native";
-import { Center } from "@/src/components/ui/center";
-import { getCompletion, getStreamingCompletion } from "../lib/ai/fetch";
-import { HStack } from "./ui/hstack";
 import {
-  Bot,
-  ChartScatter,
-  Leaf,
-  Scan,
-  Circle,
-  Sparkles,
-  Sparkle,
-  Image as ImageLucide,
-  GalleryHorizontal, UserRound,
+  Bot
 } from "lucide-react-native";
-import { set } from "zod";
+import React, { useState } from "react";
+import { Pressable, StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
+import { getCompletion } from "../../lib/ai/fetch";
+import { HStack } from "../ui/hstack";
 
 
 interface DrawerState {

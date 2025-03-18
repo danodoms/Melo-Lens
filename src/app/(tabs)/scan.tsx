@@ -1,5 +1,5 @@
 import { melonDiseaseClasses } from "@/assets/model/tflite/melon-disease/melon-disease-classes";
-import ScanResultDrawer from "@/src/components/ScanResultDrawer";
+import ScanResultDrawer from "@/src/components/scan-result-drawer"
 import {
   Button,
   ButtonIcon,
