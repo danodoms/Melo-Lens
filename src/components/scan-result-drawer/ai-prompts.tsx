@@ -5,15 +5,12 @@ import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { HStack } from "@/src/components/ui/hstack";
 import { getAiResponse } from "../../lib/ai/fetch";
-import { AiSession, DrawerState } from "./index";
-
-
+import { AiSession, DrawerState } from "./types";
 
 type RenderAiPromptsProps = {
     drawerState: DrawerState;
     setAiSession: (aiSession: AiSession) => void;
 };
-
 
 export const RenderAiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSession }) => {
 
@@ -23,19 +20,21 @@ export const RenderAiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, s
         "How can I avoid this in the future?"
     ]
 
-
     const handleAiPrompt = async (prompt: string) => {
         function generatePrompt(prompt: string) {
-            const promptPrefix = "In a concise manner,";
-            return `${promptPrefix} ${prompt} for watermelon ${drawerState.classification}`;
+            // const promptPrefix = "In a concise manner,";
+            // return `${promptPrefix} ${prompt} for watermelon ${drawerState.classification}`;
+
+            //this prefix controls how the ai response, and is based on prompt engineering best practices
+            // const promptPrefix = `You are an expert in plant pathology. Given that the user has classified their watermelon as having "${drawerState.classification}", provide detailed insights on the following:`;
+            const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`
+            return `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures.Keep the response clear and actionable.`;
         }
 
         const response = await getAiResponse(generatePrompt(prompt));
 
         setAiSession({ prompt, response });
     };
-
-
 
     return (
         <VStack className="w-full mt-8">
