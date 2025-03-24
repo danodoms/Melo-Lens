@@ -9,10 +9,11 @@ import { VStack } from "@/src/components/ui/vstack";
 import LottieView from "lottie-react-native";
 import React, { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { RenderAiPrompts } from "../ai-prompts";
+import { AiPrompts } from "../ai-prompts";
 import { renderConfidenceRemark } from "../confidence-remark";
 import { renderSaveResultComponent } from "../save-result-button";
 import { AiSession, DrawerState } from "../types";
+import { Button, ButtonText } from "../../ui/button";
 
 
 
@@ -83,7 +84,7 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({ drawerState, set
                         )}
 
                         {hasResults &&
-                            RenderAiPrompts({
+                            AiPrompts({
                                 drawerState,
                                 setAiSession: (aiSession: AiSession) => {
                                     setIsAiPageShown(true);
@@ -97,8 +98,11 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({ drawerState, set
             </DrawerBody>
 
             {canSaveResult && (
-                <DrawerFooter>
+                <DrawerFooter className="flex flex-col flex-1 gap-4">
                     {renderSaveResultComponent(drawerState.saveResultCallback, drawerState.isResultSaved)}
+                    {/* <Button className=" w-full" variant="link">
+                        <ButtonText>Close</ButtonText>
+                    </Button> */}
                 </DrawerFooter>
             )}
         </>

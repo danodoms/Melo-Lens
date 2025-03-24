@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, ButtonText } from "@/src/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
+import { Check } from "lucide-react-native";
 
 /**
  * Renders a save result button component.
@@ -28,12 +29,14 @@ import { Button, ButtonText } from "@/src/components/ui/button";
  */
 export const renderSaveResultComponent = (saveResultCallback: () => void, isResultSaved: boolean) => {
     return isResultSaved ? (
-        <Button className="flex-1" variant="outline">
+        <Button className="w-full h-12 rounded-xl items-center" variant="link">
+            <ButtonIcon as={Check}></ButtonIcon>
             <ButtonText>Result Saved</ButtonText>
         </Button>
     ) : (
-        <Button onPress={saveResultCallback} className="flex-1">
-            <ButtonText>Save and close</ButtonText>
+        <Button onPress={saveResultCallback} className="w-full h-12 rounded-xl items-center">
+            <ButtonIcon as={Check}></ButtonIcon>
+            <ButtonText>Save result</ButtonText>
         </Button>
     );
 };

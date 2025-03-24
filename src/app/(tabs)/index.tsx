@@ -207,7 +207,7 @@ export default function HomeScreen() {
                 Scan results will display here
               </Text>
               <Text className="text-center opacity-50 text-sm">
-                Powered by XR Vision
+                Powered by Melo Lens
               </Text>
             </Box>
 

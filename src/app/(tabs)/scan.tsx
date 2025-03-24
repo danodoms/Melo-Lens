@@ -1,5 +1,5 @@
 import { melonDiseaseClasses } from "@/assets/model/tflite/melon-disease/melon-disease-classes";
-import ScanResultDrawer from "@/src/components/scan-result-drawer"
+import ScanResultDrawer from "@/src/components/scan-result-drawer";
 import {
   Button,
   ButtonIcon,
@@ -7,28 +7,27 @@ import {
 } from "@/src/components/ui/button";
 import { Center } from "@/src/components/ui/center";
 import { HStack } from "@/src/components/ui/hstack";
-import { Icon } from "@/src/components/ui/icon";
 import { Text } from "@/src/components/ui/text";
-import { Toast, ToastDescription, ToastTitle, useToast } from '@/src/components/ui/toast';
 import { VStack } from "@/src/components/ui/vstack";
+import { useCustomToast } from "@/src/hooks/useCustomToast";
+import { useIsOffline } from "@/src/hooks/useIsOffline";
 import { useTfliteModel } from "@/src/hooks/useTfliteModel";
+import { fetchXaiAnalysis } from "@/src/lib/api/fetchXaiAnalysis";
 import { globalStore } from "@/src/state/globalState";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { useSupabase } from "@/src/utils/useSupabase";
 import { use$ } from "@legendapp/state/react";
-import axios from 'axios';
-import { fromByteArray } from 'base64-js';
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import {
   Brain,
   BrainCog,
+  Check,
   ChevronUp,
-  HelpCircleIcon,
+  HelpCircle,
   Images,
-  RefreshCw,
-  X
+  RefreshCw
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
@@ -57,8 +56,7 @@ export default function ScanScreen() {
     runModelPrediction,
   } = useTfliteModel();
 
-  const syncLocalImagesToRemoteDatabase = useSupabase()
-
+  const isOffline = useIsOffline();
 
   const cameraRef = useRef<Camera | null>(null);
   const [capturedImageUri, setCapturedImageUri] = useState<string | null>(null); // To hold the image URI
@@ -72,57 +70,11 @@ export default function ScanScreen() {
   const [isDrawerOpen, setDrawerOpen] = useState(false)
 
   const backendAddress = use$(globalStore.backendAddress);
-  /*const backendAddress = AsyncStorage.getItem('backendAddress');*/
-
-
-
-
-  const toast = useToast()
-
-  function showNetworkErrorToast() {
-    toast.show({
-      id: "networkErrorToast",
-      duration: 5000,
-      placement: 'top',
-      onCloseComplete: undefined,
-      avoidKeyboard: true,
-      containerStyle: undefined,
-      render: () => (
-        <Toast
-          action="error"
-          variant="outline"
-          nativeID="networkErrorToast"
-          className="p-4 gap-6 border-error-500 w-full shadow-hard-5 max-w-[443px] flex-row justify-between"
-        >
-          <HStack space="md">
-            <Icon as={HelpCircleIcon} className="stroke-error-500 mt-0.5" />
-            <VStack space="xs">
-              <ToastTitle className="font-semibold text-error-500">
-                Error!
-              </ToastTitle>
-              <ToastDescription size="sm">
-                Something went wrong.
-              </ToastDescription>
-            </VStack>
-          </HStack>
-          <HStack className="min-[450px]:gap-3 gap-1">
-            <Button variant="link" size="sm" className="px-3.5 self-center">
-              <ButtonText>Retry</ButtonText>
-            </Button>
-            <Pressable onPress={() => toast.close("networkErrorToast")}>
-              <Icon as={X} />
-            </Pressable>
-          </HStack>
-        </Toast>
-      ),
-    })
-  }
 
   const API_URL = `https://${backendAddress}/generate-heatmap/`;
-
-
-
+  const { showToast } = useCustomToast();
   const { addResult } = useSupaLegend()
+  const syncLocalImagesToRemoteDatabase = useSupabase()
 
   // Ensure TensorFlow is ready before classifying
   useEffect(() => {
@@ -163,6 +115,36 @@ export default function ScanScreen() {
   }
 
 
+  // 🔹 Function for local (offline) inference
+  const runLocalInference = (imageUri: string) => {
+    runModelPrediction(imageUri, "float32", melonDiseaseClasses);
+  };
+
+
+  // 🔹 Function for online (XAI API) inference
+  const runOnlineInference = async (imageUri: string) => {
+    await fetchXaiAnalysis({
+      imageUri,
+      apiUrl: API_URL,
+      onSuccess: (confidence, label, heatmapUri) => {
+        setConfidence(parseFloat(Number(confidence).toFixed(2)));
+        setClassification(label);
+        setXaiHeatmapUri(heatmapUri);
+      },
+      onError: (error) => {
+        console.error("XAI API Error:", error);
+        showToast({
+          title: "XAI Error",
+          message: error.message,
+          icon: HelpCircle,
+          type: "error",
+          onActionPress: () => console.log("Retry clicked"),
+        });
+      },
+    });
+  };
+
+
   const processImageAndClassify = async (imageUri: string) => {
     // Reset predictions and open the result drawer
     setIsResultSaved(false)
@@ -178,50 +160,14 @@ export default function ScanScreen() {
     );
     setCapturedImageUri(manipulatedImage.uri);
 
-    // If XAI is disabled, use offline model prediction
-    if (!isXaiEnabled) {
-      runModelPrediction(manipulatedImage.uri, "float32", melonDiseaseClasses);
-      return
-    }
-
-    // Prepare the FormData to send to the API
-    const formData = new FormData();
-    formData.append('file', {
-      uri: manipulatedImage.uri,
-      name: 'image.jpg',
-      type: 'image/jpeg'
-    });
-
-    // Send image to API and process the response
-    axios.post(API_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      params: {
-        'enable_gradcam': true
-      },
-      responseType: "arraybuffer"
-    })
-      .then(response => {
-        setConfidence((parseFloat(response.headers["prediction-confidence"] * 100)).toFixed(2));
-        setClassification(response.headers["prediction-label"])
-
-        const bytes = new Uint8Array(response.data);
-        const base64String = fromByteArray(bytes);
-        const imageUri = `data:image/jpeg;base64,${base64String}`;
-        setXaiHeatmapUri(imageUri);
-      })
-      .catch(error => {
-        console.error("Error calling XAI API:", error);
-        showNetworkErrorToast()
-      });
-
-
-
+    // Choose inference method explicitly
+    isXaiEnabled
+      ? runOnlineInference(manipulatedImage.uri)
+      : runLocalInference(manipulatedImage.uri);
   }
 
 
-  const captureAndClassify = async () => {
+  const captureImage = async () => {
     if (!model) {
       console.log("Model is not loaded yet.");
       return;
@@ -274,14 +220,26 @@ export default function ScanScreen() {
     addResult(capturedImageUri, classification, confidence);
     setDrawerOpen(false)
     setIsResultSaved(true)
-    syncLocalImagesToRemoteDatabase()
+
+    showToast({
+      title: "Success!",
+      message: "Result saved",
+      icon: Check,
+      type: "success",
+      // actionLabel: "Close",
+      onActionPress: () => console.log("Closed"),
+    })
+
+    if (!isOffline) {
+      console.log("User is online, attempting to sync results with remote database")
+      syncLocalImagesToRemoteDatabase()
+    }
   }
 
   function RenderButtonComponent() {
 
     return (
       <VStack className="p-4">
-
         <HStack className="gap-4 mb-8 flex justify-center items-center w-full ">
           <Button
             size="md"
@@ -304,7 +262,7 @@ export default function ScanScreen() {
             <ButtonIcon size="xl" as={Images} />
           </Button>
 
-          <Pressable onPress={captureAndClassify}>
+          <Pressable onPress={captureImage}>
             <Center className="size-20 rounded-full border-4 border-white">
               <Center className="size-16 rounded-full bg-white opacity-20" />
             </Center>

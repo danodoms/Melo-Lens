@@ -12,7 +12,7 @@ type RenderAiPromptsProps = {
     setAiSession: (aiSession: AiSession) => void;
 };
 
-export const RenderAiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSession }) => {
+export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSession }) => {
 
     const prompts = [
         "What are the possible treatments?",
@@ -30,6 +30,9 @@ export const RenderAiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, s
             const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`
             return `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures.Keep the response clear and actionable.`;
         }
+
+        setAiSession({ prompt, response: "Generating response..." });
+        console.log("generatingggg response")
 
         const response = await getAiResponse(generatePrompt(prompt));
 
