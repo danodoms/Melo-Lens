@@ -22,11 +22,11 @@ import { useDatabase } from "@/src/hooks/useDatabase";
 import { observer } from "@legendapp/state/react";
 import { observable, observe } from "@legendapp/state";
 import { enableReactTracking } from "@legendapp/state/config/enableReactTracking";
-import {useSupaLegend} from "@/src/utils/supalegend/useSupaLegend";
-import {Center} from "@/src/components/ui/center";
-import {Icon} from "@/src/components/ui/icon"
-import {Brain, BrainCog, RefreshCw, Trash, X} from "lucide-react-native";
-import { GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
+import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
+import { Center } from "@/src/components/ui/center";
+import { Icon } from "@/src/components/ui/icon"
+import { Brain, BrainCog, RefreshCw, Trash, X } from "lucide-react-native";
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 
 export default function ResultsScreen() {
   const { results, clearResults } = useSupaLegend();
@@ -49,7 +49,7 @@ export default function ResultsScreen() {
     }
   };
 
-  function formatTimestamp(timestamp:string, includeTimeZone = true) {
+  function formatTimestamp(timestamp: string, includeTimeZone = true) {
     // Parse the timestamp into a Date object
     const date = new Date(timestamp);
 
@@ -72,32 +72,32 @@ export default function ResultsScreen() {
     return date.toLocaleString("en-US", options as Intl.DateTimeFormatOptions);
   }
 
-// Example usage
+  // Example usage
   const timestamp = "2025-01-02 04:47:49.176207+00";
   console.log(formatTimestamp(timestamp, true));  // With tim
 
-  if(!results.length){
-    return(
-        <Center className="gap-4 pt-12 bg-background-0 border-green-500 h-full">
-          <Text className="opacity-50 text-center text-lg">No results</Text>
-        </Center>
+  if (!results.length) {
+    return (
+      <Center className="gap-4 pt-12 bg-background-0 border-green-500 h-full">
+        <Text className="opacity-50 text-center text-lg">No results</Text>
+      </Center>
     )
   }
 
   const renderRightActions = (id: string, onDelete: (id: string) => void) => {
     return (
-        <Center className="p-4 rounded-md">
-          <Button
-              size="md"
-              variant="solid"
-              action="negative"
-              onPress={() => onDelete(id)} // Trigger delete action
-              className="rounded-md"
-          >
-            <ButtonIcon as={Trash} />
-            <ButtonText>Delete</ButtonText>
-          </Button>
-        </Center>
+      <Center className="p-4 rounded-md">
+        <Button
+          size="md"
+          variant="solid"
+          action="negative"
+          onPress={() => onDelete(id)} // Trigger delete action
+          className="rounded-md"
+        >
+          <ButtonIcon as={Trash} />
+          <ButtonText>Delete</ButtonText>
+        </Button>
+      </Center>
 
     );
   };
@@ -109,41 +109,41 @@ export default function ResultsScreen() {
 
 
   return (
-      <VStack className="gap-4 pt-20 bg-background-0 border-green-500 h-full">
-        <ScrollView className="flex gap-4">
-          <GestureHandlerRootView >
+    <VStack className="gap-4 pt-20 bg-background-0 border-green-500 h-full">
+      <ScrollView className="flex gap-4">
+        <GestureHandlerRootView >
           {results.map((result) => (
 
-              <Swipeable
-                  key={result.id}
-                  renderRightActions={() => renderRightActions(result.id, onDelete)} // Swipe actions
-               /*   onSwipeableOpen={direction:"right" swipeable: ()=>setIsItemSwiped(true)}*/
-              >
-                <HStack className="gap-4 border-red-500 px-4 py-2 rounded-lg items-center">
-                  <Image
-                      className="rounded-md border-white-50 border-2"
-                      source={{
-                        uri: getScanResultImageUriFromResultId(result.id),
-                      }}
-                      alt="image-result"
-                  />
+            <Swipeable
+              key={result.id}
+              renderRightActions={() => renderRightActions(result.id, onDelete)} // Swipe actions
+            /*   onSwipeableOpen={direction:"right" swipeable: ()=>setIsItemSwiped(true)}*/
+            >
+              <HStack className="gap-4 border-red-500 px-4 py-2 rounded-lg items-center">
+                <Image
+                  className="rounded-md border-white-50 border-2"
+                  source={{
+                    uri: getScanResultImageUriFromResultId(result.id),
+                  }}
+                  alt="image-result"
+                />
 
-                  <VStack className="border-green-500">
-                    <Text className="font-bold text-lg">{result.classification}</Text>
-                    <Text className="opacity-50">{result.confidence}% Confidence</Text>
-                    <Text className="opacity-50 text-sm">
-                      {result.created_at && formatTimestamp(result.created_at || '', false)}
-                    </Text>
+                <VStack className="border-green-500">
+                  <Text className="font-bold text-lg">{result.classification}</Text>
+                  <Text className="opacity-50">{result.confidence}% Confidence</Text>
+                  <Text className="opacity-50 text-sm">
+                    {result.created_at && formatTimestamp(result.created_at || '', false)}
+                  </Text>
 
                   {/*  <Text className="opacity-50 text-sm">Swipe right to delete</Text>*/}
-                  </VStack>
-                </HStack>
-              </Swipeable>
+                </VStack>
+              </HStack>
+            </Swipeable>
 
           ))}
-          </GestureHandlerRootView>
-        </ScrollView>
-      </VStack>
+        </GestureHandlerRootView>
+      </ScrollView>
+    </VStack>
 
   );
 }

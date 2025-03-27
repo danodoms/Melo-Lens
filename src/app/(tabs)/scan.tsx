@@ -27,7 +27,8 @@ import {
   ChevronUp,
   HelpCircle,
   Images,
-  RefreshCw
+  RefreshCw,
+  SwitchCamera
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
@@ -251,10 +252,14 @@ export default function ScanScreen() {
             <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} />
           </Button>
 
-          <Button size="md" variant="solid" className="rounded-full" onPress={() => setDrawerOpen(true)}>
-            {/*<ButtonText >Show Drawer</ButtonText>*/}
-            <ButtonIcon as={ChevronUp} />
-          </Button>
+          {classification && (
+            <Button size="md" variant="solid" className="rounded-full" onPress={() => setDrawerOpen(true)}>
+              {/*<ButtonText >Show Drawer</ButtonText>*/}
+              <ButtonIcon as={ChevronUp} />
+            </Button>
+          )}
+
+
         </HStack>
 
         <HStack className="mb-4 flex justify-evenly items-center border-red-500">
@@ -269,7 +274,7 @@ export default function ScanScreen() {
           </Pressable>
 
           <Button size="xl" variant="solid" className="rounded-full p-4" onPress={toggleCameraFacing}>
-            <ButtonIcon size="xl" as={RefreshCw} />
+            <ButtonIcon size="xl" as={SwitchCamera} />
           </Button>
         </HStack>
       </VStack>

@@ -9,7 +9,7 @@ type ScanResultDrawerProps = {
 }
 
 const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
-    const [aiSession, setAiSession] = useState<AiSession>({ prompt: "", response: "" });
+    const [aiSession, setAiSession] = useState<AiSession>({ prompt: "", response: "", isGenerating: false });
     const [isAiPageShown, setIsAiPageShown] = useState(false);
 
     return (

@@ -1,239 +1,304 @@
-import { Dimensions, Pressable } from "react-native";
-
+import { Dimensions } from "react-native";
 import { Text } from "@/src/components/ui/text";
-
-import {
-  Bot,
-  ChartScatter,
-  Leaf,
-  Scan,
-  Circle,
-  Sparkles,
-  Sparkle,
-  Image as ImageLucide,
-  GalleryHorizontal, UserRound,
-} from "lucide-react-native";
-import { VStack } from "@/src/components/ui/vstack";
+import { Avatar } from "@/src/components/ui/avatar";
 import { Box } from "@/src/components/ui/box";
 import { Heading } from "@/src/components/ui/heading";
-import LottieView from "lottie-react-native";
-import React from "react";
 import { HStack } from "@/src/components/ui/hstack";
+import { VStack } from "@/src/components/ui/vstack";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
-import { getPrimaryColor } from "@expo/config-plugins/build/android/PrimaryColor";
 import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallbackText,
-  AvatarImage,
-} from "@/src/components/ui/avatar";
-
-import { useDatabase } from "@/src/hooks/useDatabase";
-import { Image } from "@/src/components/ui/image";
-import { getScanResultImageUriFromResultId } from "@/src/lib/imageUtil";
-import {
-  Extrapolation,
-  interpolate,
-  useSharedValue,
-} from "react-native-reanimated";
-import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
-import Pagination from "react-native-reanimated-carousel";
-import { Button, ButtonText } from "@/src/components/ui/button";
-import { FlashList } from "@shopify/flash-list";
+  ChartScatter,
+  GalleryHorizontal,
+  Image as ImageLucide,
+  Scan,
+  Sparkle,
+  UserRound,
+  Search,
+  ArrowRight,
+  BarChart3,
+  Camera,
+  Clock,
+  Settings,
+  Plus
+} from "lucide-react-native";
+import React, { useState } from "react";
+import { Button, ButtonText, ButtonIcon } from "@/src/components/ui/button";
 import { Center } from "@/src/components/ui/center";
+import { Icon } from "@/src/components/ui/icon";
+import { Image } from "@/src/components/ui/image";
 import { Skeleton } from "@/src/components/ui/skeleton";
+import { getScanResultImageUriFromResultId } from "@/src/lib/imageUtil";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
+import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
-import { Icon } from "@/src/components/ui/icon"
+import Carousel from "react-native-reanimated-carousel";
+import { Pressable } from "react-native";
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
   const { width, height } = Dimensions.get("window");
   const { results, topClassifications } = useSupaLegend();
 
-  /*const progress = useSharedValue<number>(0);*/
-
   return (
-    <VStack className="p-4 gap-4 h-full bg-background-0 pt-20">
-      <HStack className=" rounded-md mb-4 justify-between flex">
-        <HStack className="gap-1">
-          <Heading className="flex flex-auto" size="3xl">
-            Melo Lens
-          </Heading>
-          <Sparkle color="white" className="size-xs" />
-        </HStack>
-
-        <Link href="/screens/account">
-          <Avatar size="md" className="flex">
-
-            <Icon as={UserRound} className="text-background-0"></Icon>
-            {/*<AvatarFallbackText>John Doe</AvatarFallbackText>*/}
-            {/*<AvatarImage
-              source={{
-                uri: "https://avatars.githubusercontent.com/u/165539900?v=4",
-              }}
-            />*/}
-            {/*<AvatarBadge />*/}
-          </Avatar>
-        </Link>
-
-
-
-
-        {/*<Text className="text-left">
-          Classify Rice NPK deficiencies with your camera
-        </Text>*/}
-      </HStack>
-
-      <HStack className="flex gap-4 justify-between align-items-center">
-        <HStack className="flex gap-2 align-middle align-items-center">
-          <Box className="flex align-middle flex-auto">
-            <ChartScatter color="white" className="" />
-          </Box>
-
-          <Heading className="flex align-middle" size="lg">
-            Analytics
-          </Heading>
-        </HStack>
-
-        <Button className="" variant="link">
-          <ButtonText className="opacity-50 font-normal">Show More</ButtonText>
-        </Button>
-      </HStack>
-
-      {/* <VStack className="flex gap-4 mb-4">
-        <Box className="flex flex-auto bg-background-50 rounded-lg p-4 ">
-          <Text className="font-bold">
-            {topClassifications[0].classification}
-          </Text>
-        </Box>
-
-        <Box className="flex flex-auto bg-background-50 rounded-lg p-4">
-          <Text>{topClassifications[1].classification}</Text>
-        </Box>
-
-        <Box className="flex flex-auto bg-background-50 rounded-lg p-4">
-          <Text>{topClassifications[2].classification}</Text>
-        </Box>
-        <Box className="flex flex-1 bg-background-50 rounded-lg p-4">
-          <Text>{topClassifications[3].classification}</Text>
-        </Box>
-      </VStack>*/}
-
-      <VStack className="flex mb-4 h-1/4 relative rounded-lg">
-        <FlashList
-          data={topClassifications}
-          renderItem={({ item }) => (
-            <HStack className="flex flex-auto bg-background-50 rounded-lg p-4 mb-2 align-items-center">
-              <Text className="flex flex-1 font-bold">
-                {item.classification}
-              </Text>
-              <Text className="ml-auto font-bold  rounded-lg">
-                {item.count.toString()}
-              </Text>
+    <VStack className="h-full bg-background-0 border-red-500 flex flex-col gap-4 p-4 pt-12 pb-">
+      {/* Header Layout */}
+      <Box className=" border-green-500  flex">
+        <HStack className="justify-between items-center border-teal-500">
+          <VStack>
+            {/* <Text className="text-sm">
+              Welcome to
+            </Text> */}
+            <HStack className="items-center gap-1">
+              <Heading size="2xl" className="text-tertiary-500">
+                Melo
+              </Heading>
+              <Heading size="2xl" className="text-secondary-500">
+                Lens
+              </Heading>
+              <Icon as={Sparkle} className="text-accent-500" />
             </HStack>
-          )}
-          estimatedItemSize={20}
-          ListEmptyComponent={
-            <Box className="flex bg-background-50 h-full flex-auto rounded-lg p-4">
-              <Text className="text-center flex-auto opacity-50">
-                No data to analyze
-              </Text>
-            </Box>
-          }
-        />
-      </VStack>
+          </VStack>
 
-      <HStack className="flex gap-2">
-        <Scan color="white" className="size-sm" />
-        <Heading className="" size="lg">
-          Recent Scans
-        </Heading>
-
-        <Text className="opacity-50 align-bottom ml-auto">
-          {results.length} Total Scans
-        </Text>
-      </HStack>
-
-      <Box className="relative flex flex-auto bg-background-50 rounded-lg justify-center h-full overflow-hidden">
-        {results.length > 0 ? (
-          <Carousel
-            loop
-            width={width}
-            autoPlay={true}
-            data={results}
-            autoPlayInterval={3500}
-            /*mode="parallax"*/
-            pagingEnabled={true}
-            scrollAnimationDuration={1500}
-            renderItem={({ item, index }) => (
-              <Box className="relative flex flex-auto bg-background-50 justify-center h-full overflow-hidden">
-                <Image
-                  source={{ uri: getScanResultImageUriFromResultId(item.id) }}
-                  className="absolute top-0 left-0 w-full h-full"
-                  resizeMode="cover"
-                  alt="recent-scan"
-                ></Image>
-
-                {/* Gradient Overlay */}
-                <Box className="absolute w-full h-1/2 bg-gradient-to-t z-10 from-background-0 to-transparent" />
-
-                <VStack className="z-10 absolute bottom-4 left-4  ">
-                  <Text className="font-bold text-2xl">
-                    {item.classification}
-                  </Text>
-                  <Text className="">{item.confidence}% Confidence</Text>
-                </VStack>
-              </Box>
-            )}
-          />
-        ) : (
-          <Box className="relative flex flex-auto bg-background-50 justify-center h-full overflow-hidden p-4 gap-4">
-            <Box className="flex flex-1 gap-4 max-h-1/4">
-              <Skeleton className="w-1/3 h-4 p-4" variant="rounded" />
-              <Skeleton className="w-1/5 h-2 p-4" variant="rounded" />
-            </Box>
-
-            <Box className="flex-auto justify-center rounded-lg">
-              <Center className="opacity-50 mb-1">
-                <HStack className="gap-2">
-                  <Scan color="white" />
-                  <GalleryHorizontal color="white" />
-                  <ImageLucide color="white" />
-                </HStack>
-              </Center>
-
-              <Text className="text-center opacity-50">
-                Scan results will display here
-              </Text>
-              <Text className="text-center opacity-50 text-sm">
-                Powered by Melo Lens
-              </Text>
-            </Box>
-
-            <Box className="flex flex-1 gap-4 max-h-1/4  justify-end">
-              <Skeleton className="w-3/4 h-4 p-4" variant="rounded" />
-              <Skeleton className="w-1/2 h-4 p-4" variant="rounded" />
-            </Box>
-          </Box>
-        )}
+          <HStack className="gap-3">
+            <Link href="/screens/account">
+              <Avatar
+                size="md"
+                className="bg-secondary rounded-xl"
+              >
+                <Icon as={UserRound}></Icon>
+              </Avatar>
+            </Link>
+          </HStack>
+        </HStack>
       </Box>
 
-      {/*<Pagination.
-        progress={progress}
-        data={defaultDataWith6Colors}
-        dotStyle={{ backgroundColor: "#262626" }}
-        activeDotStyle={{ backgroundColor: "#f1f1f1" }}
-        containerStyle={{ gap: 5, marginBottom: 10 }}
-        onPress={onPressPagination}
-      />*/}
+      {/* Stats Cards in Grid */}
+      <Box className=" border-orange-500">
+        <HStack className="justify-between items-center mb-3 ">
+          <HStack className="items-center gap-2">
+            <Icon as={BarChart3} />
+            <Heading size="sm" className="">
+              Analytics Overview
+            </Heading>
+          </HStack>
 
-      {/* <Box className="w-full flex align-middle bg-background-50 p-4 rounded-lg">
-        <Text className="text-sm text-center">Developed by XtraRice Team</Text>
-        <Text className="text-xs text-center">
-          danodoms - henrytors - rexpons
-        </Text>
-      </Box>*/}
+          <Button variant="link" size="sm">
+            <ButtonText className="text-secondary">View All</ButtonText>
+            <ButtonIcon as={ArrowRight} size={16} />
+          </Button>
+        </HStack>
+
+        <HStack className="gap-4">
+          {/* Stat Card 1 */}
+          <Box className="flex-1 bg-background-50 rounded-2xl p-4">
+            <VStack>
+              <Text className="text-xs ">
+                Total Scans
+              </Text>
+              <Heading
+                size="xl"
+                className=" my-1"
+              >
+                {results.length}
+              </Heading>
+              <HStack className="items-center">
+                <Icon as={Clock} className="" size={12} />
+                <Text className="text-[11px] ml-1">
+                  Last 7 days
+                </Text>
+              </HStack>
+            </VStack>
+          </Box>
+
+          {/* Stat Card 2 */}
+          <Box className="flex-1 bg-background-50 rounded-2xl p-4">
+            <VStack>
+              <Text className=" text-xs">
+                Average Confidence
+              </Text>
+              <Heading
+                size="xl"
+                className="my-1"
+              >
+                96%
+              </Heading>
+              <HStack className="items-center">
+                <Box className="size-3 rounded-full bg-tertiary-500 mr-1" />
+                <Text className=" text-[11px]">
+                  High confidence
+                </Text>
+              </HStack>
+            </VStack>
+          </Box>
+        </HStack>
+      </Box>
+
+      {/* Top Classifications Section */}
+      <Box className="flex-1 flex justify-center  border-yellow-500">
+        <HStack className="justify-between items-center mb-3">
+          <HStack className="items-center gap-2">
+            <Icon as={ChartScatter} />
+            <Heading size="sm" className="text-primary-800">
+              Top Classifications
+            </Heading>
+          </HStack>
+        </HStack>
+
+        <Box className="bg-background-50 rounded-2xl overflow-hidden border-sky-500 flex-auto">
+          <FlashList
+            data={topClassifications}
+            renderItem={({ item, index }) => (
+              <Box
+                className={`p-3 ${index === topClassifications.length - 1 ? "" : ""
+                  }`}
+              >
+                <HStack className="items-center justify-between">
+                  <HStack className="items-center gap-3">
+                    <Box
+                      className="w-8 h-8 rounded-lg justify-center items-center"
+                    >
+                      <Text className="font-bold">
+                        {index + 1}
+                      </Text>
+                    </Box>
+
+                    <VStack>
+                      <Text className=" font-medium">
+                        {item.classification}
+                      </Text>
+                      <Text className=" text-xs">
+                        {Math.round(item.count / results.length * 100)}% of total
+                      </Text>
+                    </VStack>
+                  </HStack>
+
+                  <Text
+                    className="font-bold text-tertiary-500 text-base mr-1"
+                  >
+                    {item.count}
+                  </Text>
+                </HStack>
+              </Box>
+            )}
+            estimatedItemSize={56}
+            ListEmptyComponent={
+              <Center className="p-4 border-red-500 h-full">
+                <VStack className="items-center gap-2 justify-center  border-red-500 flex">
+                  <Icon as={ChartScatter} className="" size={24} />
+                  <Text className="">
+                    No data to analyze
+                  </Text>
+                </VStack>
+              </Center>
+            }
+          />
+        </Box>
+      </Box>
+
+      {/* Recent Scans Section */}
+      <Box className="flex-[2] flex">
+        <HStack className="justify-between items-center mb-3">
+          <HStack className="items-center gap-2">
+            <Icon as={Scan} />
+            <Heading size="sm" className="text-primary-800">
+              Recent Scans
+            </Heading>
+          </HStack>
+
+          <Text className=" text-xs">
+            {results.length} Total
+          </Text>
+        </HStack>
+
+        <Box className="bg-background-50 rounded-2xl overflow-hidden flex-1">
+          {results.length > 0 ? (
+            <Carousel
+              loop
+              width={width - 32} // Adjust for padding
+              autoPlay={true}
+              data={results}
+              autoPlayInterval={4000}
+              pagingEnabled={true}
+              scrollAnimationDuration={1000}
+              renderItem={({ item, index }) => (
+                <Box className="relative h-full overflow-hidden">
+                  <Image
+                    source={{ uri: getScanResultImageUriFromResultId(item.id) }}
+                    className="absolute top-0 left-0 w-full h-full"
+                    resizeMode="cover"
+                    alt="scan-result"
+                  />
+
+                  {/* Dark overlay for text visibility */}
+                  <Box
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 80,
+                    }}
+                  />
+
+                  <VStack
+                    style={{
+                      position: 'absolute',
+                      bottom: 16,
+                      left: 16,
+                      right: 16
+                    }}
+                  >
+                    <HStack className="justify-between items-center">
+                      <VStack>
+                        <Text className="text-white font-bold text-lg">
+                          {item.classification}
+                        </Text>
+                        <HStack className="items-center">
+                          <Box
+                            className={`w-2 h-2 rounded-full mr-1.5 ${item.confidence > 90 ? "bg-secondary" :
+                              item.confidence > 70 ? "bg-accent" :
+                                "bg-primary"
+                              }`}
+                          />
+                          <Text className="text-white text-xs">
+                            {item.confidence}% Confidence
+                          </Text>
+                        </HStack>
+                      </VStack>
+
+                      <Button
+                        size="sm"
+                        style={{
+                          backgroundColor: 'rgba(255,255,255,0.2)',
+                          borderRadius: 8
+                        }}
+                      >
+                        <ButtonText className="text-white text-xs">Details</ButtonText>
+                      </Button>
+                    </HStack>
+                  </VStack>
+                </Box>
+              )}
+            />
+          ) : (
+            <Center className="h-full p-4">
+              <VStack className="items-center gap-3">
+                <Box
+                  className={`w-[60px] h-[60px] rounded-[30px] justify-center items-center`}
+                >
+                  <Icon as={GalleryHorizontal} className="" size={24} />
+                </Box>
+                <Text className="">
+                  No scan results yet
+                </Text>
+                <Button className="bg-primary rounded-lg">
+                  <ButtonIcon as={Camera} className="text-white" />
+                  <ButtonText className="text-white">Start Scanning</ButtonText>
+                </Button>
+              </VStack>
+            </Center>
+          )}
+        </Box>
+      </Box>
     </VStack>
   );
 }

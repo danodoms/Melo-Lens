@@ -4,11 +4,12 @@ import { DrawerBody, DrawerHeader } from "@/src/components/ui/drawer";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
-import { Bot, MoveLeft } from "lucide-react-native";
+import { Bot, LoaderCircle, MoveLeft } from "lucide-react-native";
 import React from "react";
 import Markdown from "react-native-markdown-display";
 import { HStack } from "../../ui/hstack";
 import { AiSession, DrawerState } from "../types";
+import { Icon } from "../../ui/icon";
 
 
 type AiSessionViewProps = {
@@ -39,11 +40,19 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({ drawerState, aiSes
         </DrawerHeader>
         <DrawerBody>
             {/* <Text>{aiSession.prompt}</Text> */}
-            <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
-                <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
-                    {aiSession.response.trim()}
-                </Markdown>
-            </Box>
+
+            {aiSession.isGenerating ? (
+                <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
+                    <Icon as={LoaderCircle} className="" />
+                </Box>
+            ) : (
+                <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
+                    <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
+                        {aiSession.response.trim()}
+                    </Markdown>
+                </Box>
+            )}
+
         </DrawerBody>
     </>
 );

@@ -31,12 +31,12 @@ export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSe
             return `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures.Keep the response clear and actionable.`;
         }
 
-        setAiSession({ prompt, response: "Generating response..." });
+        setAiSession({ prompt, response: "Generating response...", isGenerating: true });
         console.log("generatingggg response")
 
         const response = await getAiResponse(generatePrompt(prompt));
 
-        setAiSession({ prompt, response });
+        setAiSession({ prompt, response, isGenerating: false });
     };
 
     return (
