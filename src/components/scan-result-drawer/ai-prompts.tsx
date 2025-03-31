@@ -6,6 +6,7 @@ import { VStack } from "@/src/components/ui/vstack";
 import { HStack } from "@/src/components/ui/hstack";
 import { getAiResponse } from "../../lib/ai/fetch";
 import { AiSession, DrawerState } from "./types";
+import { Icon } from "../ui/icon";
 
 type RenderAiPromptsProps = {
     drawerState: DrawerState;
@@ -15,9 +16,16 @@ type RenderAiPromptsProps = {
 export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSession }) => {
 
     const prompts = [
-        "What are the possible treatments?",
-        "How bad is this, and what should I expect?",
-        "How can I avoid this in the future?"
+        "What treatments work best for this?",
+        "How serious is this issue?",
+        "How can I prevent this in the future?",
+        "What early symptoms should I watch for?",
+        "Are there effective organic treatments?",
+        "How does weather affect this problem?",
+        "How long does recovery take?",
+        "Can this spread to other plants?",
+        "How often should I monitor for this?",
+        "What should be my first response?",
     ]
 
     const handleAiPrompt = async (prompt: string) => {
@@ -41,16 +49,23 @@ export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSe
 
     return (
         <VStack className="w-full mt-8">
-            <HStack className="gap-2 items-center opacity-50">
-                <Bot color="white" className="size-sm" />
+            <HStack className="gap-2 items-center opacity-50 mb-2">
+                <Icon as={Bot} className="text-primary-500" />
                 <Text className="font-bold">Ask AI</Text>
             </HStack>
 
-            {prompts.map((prompt, index) =>
-                <Button variant="link" key={prompt + index} onPress={() => handleAiPrompt(prompt)} className="flex-1 w-full justify-start">
-                    <ButtonText>{prompt}</ButtonText>
-                </Button>
-            )}
+            <HStack className="max-h-64 flex-wrap gap-2 pb-8 overflow-auto">
+                {prompts.map((prompt, index) => (
+                    <Button
+                        variant="link"
+                        key={prompt + index}
+                        onPress={() => handleAiPrompt(prompt)}
+                        className="whitespace-nowrap justify-start bg-tertiary-500 px-4 rounded-full rounded-tl-none"
+                    >
+                        <ButtonText className="text-background-0">{prompt}</ButtonText>
+                    </Button>
+                ))}
+            </HStack>
         </VStack>
     );
 };

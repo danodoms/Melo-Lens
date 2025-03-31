@@ -55,7 +55,7 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({ drawerState, set
                 )}
             </DrawerHeader>
 
-            <DrawerBody>
+            <DrawerBody className="overflow-auto">
                 {!drawerState.imageUri ? (
                     <Skeleton variant="rounded" className="h-full w-full" />
                 ) : (

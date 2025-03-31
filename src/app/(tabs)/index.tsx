@@ -1,4 +1,4 @@
-import { Dimensions } from "react-native";
+import { Dimensions, View } from "react-native";
 import { Text } from "@/src/components/ui/text";
 import { Avatar } from "@/src/components/ui/avatar";
 import { Box } from "@/src/components/ui/box";
@@ -39,7 +39,7 @@ export default function HomeScreen() {
   const { results, topClassifications } = useSupaLegend();
 
   return (
-    <VStack className="h-full bg-background-0 border-red-500 flex flex-col gap-4 p-4 pt-12 pb-">
+    <VStack className="h-full bg-background-0 border-red-500 flex flex-col gap-4 p-4 pt-12">
       {/* Header Layout */}
       <Box className=" border-green-500  flex">
         <HStack className="justify-between items-center border-teal-500">
@@ -82,8 +82,8 @@ export default function HomeScreen() {
           </HStack>
 
           <Button variant="link" size="sm">
-            <ButtonText className="text-secondary">View All</ButtonText>
-            <ButtonIcon as={ArrowRight} size={16} />
+            <ButtonText className="">View All</ButtonText>
+            <ButtonIcon as={ArrowRight} />
           </Button>
         </HStack>
 
@@ -299,6 +299,8 @@ export default function HomeScreen() {
           )}
         </Box>
       </Box>
+
+      <Box className="h-16"></Box>
     </VStack>
   );
 }

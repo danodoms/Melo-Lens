@@ -1,5 +1,6 @@
 import { melonDiseaseClasses } from "@/assets/model/tflite/melon-disease/melon-disease-classes";
 import ScanResultDrawer from "@/src/components/scan-result-drawer";
+import { Box } from "@/src/components/ui/box";
 import {
   Button,
   ButtonIcon,
@@ -16,6 +17,8 @@ import { fetchXaiAnalysis } from "@/src/lib/api/fetchXaiAnalysis";
 import { globalStore } from "@/src/state/globalState";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { useSupabase } from "@/src/utils/useSupabase";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { use$ } from "@legendapp/state/react";
 import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
@@ -237,10 +240,11 @@ export default function ScanScreen() {
     }
   }
 
-  function RenderButtonComponent() {
 
+
+  function RenderButtonComponent({ className }: Readonly<{ className?: string }>) {
     return (
-      <VStack className="p-4">
+      <VStack className={`p-4 ${className}`}>
         <HStack className="gap-4 mb-8 flex justify-center items-center w-full ">
           <Button
             size="md"
@@ -263,18 +267,21 @@ export default function ScanScreen() {
         </HStack>
 
         <HStack className="mb-4 flex justify-evenly items-center border-red-500">
-          <Button size="xl" variant="solid" className="rounded-full p-4" onPress={importImageAndClassify} >
-            <ButtonIcon size="xl" as={Images} />
+          <Button size="xl" variant="solid" className="rounded-full p-4 bg-background-0" onPress={importImageAndClassify} >
+            <ButtonIcon size="xl" as={Images} className="text-primary-500" />
           </Button>
 
           <Pressable onPress={captureImage}>
-            <Center className="size-20 rounded-full border-4 border-white">
-              <Center className="size-16 rounded-full bg-white opacity-20" />
+            <Center className="size-20 rounded-full border-4 border-white ">
+              <Center className="size-16 rounded-full bg-tertiary-50 opacity-50 absolute" />
+              <Ionicons name="leaf-outline" size={24} color="white" className="absolute" />
+              {/* <MaterialCommunityIcons name="cube-scan" size={24} color="white" /> */}
+              {/* <MaterialCommunityIcons name="magnify-scan" size={24} color="white" /> */}
             </Center>
           </Pressable>
 
-          <Button size="xl" variant="solid" className="rounded-full p-4" onPress={toggleCameraFacing}>
-            <ButtonIcon size="xl" as={SwitchCamera} />
+          <Button size="xl" variant="solid" className="rounded-full p-4 bg-background-0" onPress={toggleCameraFacing}>
+            <ButtonIcon size="xl" as={SwitchCamera} className="text-primary-500" />
           </Button>
         </HStack>
       </VStack>
@@ -283,7 +290,7 @@ export default function ScanScreen() {
 
   return (
     <VStack
-      className="bg-green h-full relative justify-between"
+      className="bg-green h-full relative border-red-500 justify-end"
     >
       <Camera
         device={device}
@@ -301,13 +308,13 @@ export default function ScanScreen() {
       />
 
       {/*FOR DEVELOPERS*/}
-      <VStack className="w-full justify-center mb-4 opacity-50 pt-20">
+      <VStack className="w-full justify-center mb-4 opacity-50 pt-20 ">
         <Text className="font-medium text-xs text-center">XAI is using this API route, modify it in accounts page</Text>
         <Text className="text-xs text-center">{API_URL}</Text>
       </VStack>
 
 
-      <RenderButtonComponent />
+      <RenderButtonComponent className="justify-self-end border-green-500" />
 
       <ScanResultDrawer
         drawerState={{
@@ -322,6 +329,9 @@ export default function ScanScreen() {
           confidence,
         }}
       />
+
+      {/* this is the navbar spacer */}
+      <Box className="h-16"></Box>
     </VStack>
   );
 }

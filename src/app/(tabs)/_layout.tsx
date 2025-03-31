@@ -1,53 +1,60 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet, View } from "react-native";
 
-import { HapticTab } from "@/src/components/HapticTab";
-import { IconSymbol } from "@/src/components/ui/IconSymbol";
-import TabBarBackground from "@/src/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
+import { HapticTab } from "@/src/components/HapticTab";
+import TabBarBackground from "@/src/components/ui/TabBarBackground";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
-import { House, Scan, History, UserRound } from "lucide-react-native";
-import { cn } from "@gluestack-ui/nativewind-utils/cn";
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { cssInterop } from "nativewind";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Box } from "@/src/components/ui/box";
+
 
 export default function TabLayout() {
+  const { width } = Dimensions.get("window"); // Get device width
   const colorScheme = useColorScheme();
 
   const styles = StyleSheet.create({
-    // tabBarIOS: {
-    //   position: "absolute",
-    //   backgroundColor: "transparent",
-    //   shadowColor: "#000",
-    //   shadowOpacity: 0.1,
-    //   shadowOffset: { width: 0, height: -2 },
-    //   shadowRadius: 8,
-    //   borderTopLeftRadius: 16,
-    //   borderTopRightRadius: 16,
-    // },
     tabBarAndroid: {
       position: "absolute", // Makes it float
+      paddingLeft: 16,
+      paddingRight: 16,
       bottom: 16, // Moves it up while keeping space
-      left: 16,
-      right: 16,
-      backgroundColor: "white", // Fully transparent
+      backgroundColor: Colors[colorScheme ?? "light"].tint, // Fully transparent
       borderRadius: 24, // Rounded edges
-      height: 60, // Adjust height to fit rounded shape
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowOffset: { width: 0, height: 0 },
-    }
-  });
+      borderWidth: 0, // Ensure no border
+      borderColor: "transparent", // Explicitly set to transparent
+      height: 52, // Adjust height to fit rounded shape
+      // justifyContent: "center",
+      width: "60%", // 80% width for centering
+      alignSelf: "center", // Centers it
+      left: "60%",
+      transform: [{ translateX: -(width * 0.40) }], // Move left by half its width
 
+      // Ensure Android has no elevation
+      elevation: 0,
+
+      // Remove potential shadow effects
+      shadowColor: "transparent",
+      shadowOpacity: 0,
+      shadowOffset: { width: 0, height: 0 },
+      shadowRadius: 0,
+    },
+  });
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].background,
         headerShown: false,
+        // tabBarShowLabel: true,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
-          // ios: styles.tabBarIOS,
           android: styles.tabBarAndroid,
         }),
       }}
@@ -57,7 +64,12 @@ export default function TabLayout() {
         options={{
           tabBarShowLabel: false,
           title: "Home",
-          tabBarIcon: ({ color }) => <House color={color} />,
+          tabBarIcon: ({ color, focused }) =>
+            focused ? (
+              <MaterialIcons name="home-filled" size={24} color={color} />
+            ) : (
+              <MaterialCommunityIcons name="home-variant-outline" size={24} color={color} />
+            ),
         }}
       />
       <Tabs.Screen
@@ -65,15 +77,25 @@ export default function TabLayout() {
         options={{
           tabBarShowLabel: false,
           title: "Scan",
-          tabBarIcon: ({ color }) => <Scan color={color} />,
+          tabBarIcon: ({ color, focused }) =>
+            focused ? (
+              <Ionicons name="scan" size={24} color={color} />
+            ) : (
+              <Ionicons name="scan-outline" size={24} color={color} />
+            ),
         }}
       />
-      <Tabs.Screen
+      < Tabs.Screen
         name="results"
         options={{
           tabBarShowLabel: false,
           title: "Results",
-          tabBarIcon: ({ color }) => <History color={color} />,
+          tabBarIcon: ({ color, focused }) =>
+            focused ? (
+              <Ionicons name="file-tray" size={24} color={color} />
+            ) : (
+              <Ionicons name="file-tray-outline" size={24} color={color} />
+            ),
         }}
       />
 
@@ -85,8 +107,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <UserRound color={color} />,
         }}
       /> */}
-    </Tabs>
+    </Tabs >
   );
-
-
 }

@@ -10,6 +10,8 @@ import Markdown from "react-native-markdown-display";
 import { HStack } from "../../ui/hstack";
 import { AiSession, DrawerState } from "../types";
 import { Icon } from "../../ui/icon";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/src/hooks/useColorScheme";
 
 
 type AiSessionViewProps = {
@@ -18,41 +20,47 @@ type AiSessionViewProps = {
     onBack: () => void;
 };
 
-export const AiSessionView: React.FC<AiSessionViewProps> = ({ drawerState, aiSession, onBack }) => (
-    <>
-        <DrawerHeader className="flex flex-wrap gap-2 items-center  border-red-500">
+export const AiSessionView: React.FC<AiSessionViewProps> = ({ drawerState, aiSession, onBack }) => {
 
-            <VStack className="">
-                <HStack className="gap-2 items-center opacity-50">
-                    <Bot color="white" className="size-sm" />
-                    <Text className="font-bold">Ask AI</Text>
-                </HStack>
+    const colorScheme = useColorScheme();
 
-                <Heading size="lg" className="">
-                    {aiSession.prompt}
-                </Heading>
-            </VStack>
 
-            <Button onPress={onBack} className="">
-                <ButtonIcon as={MoveLeft} />
-                <ButtonText>Back</ButtonText>
-            </Button>
-        </DrawerHeader>
-        <DrawerBody>
-            {/* <Text>{aiSession.prompt}</Text> */}
+    return (
+        <>
+            <DrawerHeader className="flex flex-wrap gap-2 items-center  border-red-500">
 
-            {aiSession.isGenerating ? (
-                <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
-                    <Icon as={LoaderCircle} className="" />
-                </Box>
-            ) : (
-                <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
-                    <Markdown style={{ body: { fontSize: 16, color: "white" } }}>
-                        {aiSession.response.trim()}
-                    </Markdown>
-                </Box>
-            )}
+                <VStack className="">
+                    <HStack className="gap-2 items-center opacity-50">
+                        <Icon as={Bot} className="text-primary-500" />
+                        <Text className="font-bold">Ask AI</Text>
+                    </HStack>
 
-        </DrawerBody>
-    </>
-);
+                    <Heading size="lg" className="">
+                        {aiSession.prompt}
+                    </Heading>
+                </VStack>
+
+                <Button onPress={onBack} className="">
+                    <ButtonIcon as={MoveLeft} />
+                    <ButtonText>Back</ButtonText>
+                </Button>
+            </DrawerHeader>
+            <DrawerBody>
+                {/* <Text>{aiSession.prompt}</Text> */}
+
+                {aiSession.isGenerating ? (
+                    <Box className="mt-4 w-full rounded-md border-gray-300 text-white">
+                        <Icon as={LoaderCircle} className="" />
+                    </Box>
+                ) : (
+                    <Box className="mt-4 w-full rounded-md border-gray-300 text-primary-500">
+                        <Markdown style={{ body: { fontSize: 16, color: Colors[colorScheme ?? "light"].tint } }}>
+                            {aiSession.response.trim()}
+                        </Markdown>
+                    </Box>
+                )}
+
+            </DrawerBody>
+        </>
+    )
+};
