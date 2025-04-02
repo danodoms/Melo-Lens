@@ -9,9 +9,9 @@ import { VStack } from "@/src/components/ui/vstack";
 import LottieView from "lottie-react-native";
 import React, { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { AiPrompts } from "../ai-prompts";
+import { AiPrompts } from "./ai-prompts";
 import { renderConfidenceRemark } from "../confidence-remark";
-import { renderSaveResultComponent } from "../save-result-button";
+import { renderSaveResultComponent } from "./save-result-button";
 import { AiSession, DrawerState } from "../types";
 import { Button, ButtonText } from "../../ui/button";
 

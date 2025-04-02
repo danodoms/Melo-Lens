@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import { supabase } from '@/src/utils/supabase'
-import Auth from '../../components/Auth'
-import Account from "@/src/components/Account"
-import {Alert, View} from 'react-native'
-import { Session } from '@supabase/supabase-js'
+import { Avatar, AvatarFallbackText, AvatarImage } from "@/src/components/ui/avatar"
+import { Button, ButtonText } from "@/src/components/ui/button"
+import { Divider } from "@/src/components/ui/divider"
+import { HStack } from "@/src/components/ui/hstack"
+import { Input, InputField } from "@/src/components/ui/input"
+import { Switch } from "@/src/components/ui/switch"
+import { Text } from "@/src/components/ui/text"
+import { VStack } from "@/src/components/ui/vstack"
 import { useSession } from '@/src/hooks/useSession'
-import {VStack} from "@/src/components/ui/vstack";
-import {HStack} from "@/src/components/ui/hstack";
-import {Avatar, AvatarFallbackText, AvatarImage} from "@/src/components/ui/avatar";
-import {Bell, RefreshCw, UserRound} from "lucide-react-native";
-import {Text} from "@/src/components/ui/text";
-import {Button, ButtonText} from "@/src/components/ui/button";
-import {Switch} from "@/src/components/ui/switch";
-import {Divider} from "@/src/components/ui/divider";
-import {Input, InputField} from "@/src/components/ui/input";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {globalStore} from "@/src/state/globalState";
+import { globalStore } from "@/src/state/globalState"
+import { supabase } from '@/src/utils/supabase'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Bell, RefreshCw, UserRound } from "lucide-react-native"
+import React, { useEffect, useState } from 'react'
+import { Alert } from 'react-native'
+import Auth from '../../components/Auth'
 
 export default function AccountScreen() {
     const session = useSession()
@@ -80,10 +78,10 @@ export default function AccountScreen() {
     }
 
     async function updateProfile({
-                                     username,
-                                     website,
-                                     avatar_url,
-                                 }: {
+        username,
+        website,
+        avatar_url,
+    }: {
         username: string
         website: string
         avatar_url: string
@@ -114,14 +112,14 @@ export default function AccountScreen() {
         }
     }
 
-    function handleSignOut(){
+    function handleSignOut() {
         supabase.auth.signOut()
         setShowAuthScreen(false)
     }
 
-    if(showAuthScreen && !session){
-        return(
-            <Auth/>
+    if (showAuthScreen && !session) {
+        return (
+            <Auth />
         )
     }
 
@@ -150,7 +148,7 @@ export default function AccountScreen() {
                     </>
 
                 ) : (
-                    <Button size="lg" className='rounded-lg w-full' variant="outline" action="primary" onPress={()=> setShowAuthScreen(true)}>
+                    <Button size="lg" className='rounded-lg w-full' variant="outline" action="primary" onPress={() => setShowAuthScreen(true)}>
                         <ButtonText>Login or Sign up</ButtonText>
                     </Button>
                 )}

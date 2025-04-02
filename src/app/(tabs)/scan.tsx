@@ -195,7 +195,6 @@ export default function ScanScreen() {
   };
 
 
-
   const importImageAndClassify = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted) {

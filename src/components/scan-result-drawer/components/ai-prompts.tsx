@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Bot } from "lucide-react-native";
+import { Bot, Sparkles } from "lucide-react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { HStack } from "@/src/components/ui/hstack";
-import { getAiResponse } from "../../lib/ai/fetch";
-import { AiSession, DrawerState } from "./types";
-import { Icon } from "../ui/icon";
+import { getAiResponse } from "../../../lib/ai/fetch";
+import { AiSession, DrawerState } from "../types";
+import { Icon } from "../../ui/icon";
 
 type RenderAiPromptsProps = {
     drawerState: DrawerState;
@@ -50,7 +50,7 @@ export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSe
     return (
         <VStack className="w-full mt-8">
             <HStack className="gap-2 items-center opacity-50 mb-2">
-                <Icon as={Bot} className="text-primary-500" />
+                <Icon as={Sparkles} className="text-primary-500" />
                 <Text className="font-bold">Ask AI</Text>
             </HStack>
 

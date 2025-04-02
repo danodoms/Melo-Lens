@@ -1,7 +1,7 @@
 import { Drawer, DrawerBackdrop, DrawerContent } from "@/src/components/ui/drawer";
 import React, { useState } from "react";
-import { AiSessionView } from "./views/ai-session-view";
-import { ScanResultView } from "./views/scan-result-view";
+import { AiSessionView } from "./components/ai-session-view";
+import { ScanResultView } from "./components/scan-result-view";
 import { AiSession, DrawerState } from "./types";
 
 type ScanResultDrawerProps = {
