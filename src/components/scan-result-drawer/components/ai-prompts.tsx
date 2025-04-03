@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { Bot, Sparkles } from "lucide-react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
+import { HStack } from "@/src/components/ui/hstack";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
-import { HStack } from "@/src/components/ui/hstack";
+import { Sparkles } from "lucide-react-native";
+import React from "react";
 import { getAiResponse } from "../../../lib/ai/fetch";
-import { AiSession, DrawerState } from "../types";
 import { Icon } from "../../ui/icon";
+import { AiSession, DrawerState } from "../types";
+
 
 type RenderAiPromptsProps = {
     drawerState: DrawerState;
@@ -42,8 +43,13 @@ export const AiPrompts: React.FC<RenderAiPromptsProps> = ({ drawerState, setAiSe
         setAiSession({ prompt, response: "Generating response...", isGenerating: true });
         console.log("generatingggg response")
 
-        const response = await getAiResponse(generatePrompt(prompt));
 
+
+        // let responseStream = ""
+        // await getAiResponseStream(prompt, (chunk: string) => setAiSession({ prompt, response: (responseStream + chunk), isGenerating: false }))
+
+
+        const response = await getAiResponse(generatePrompt(prompt));
         setAiSession({ prompt, response, isGenerating: false });
     };
 

@@ -1,38 +1,31 @@
-import { Dimensions, View } from "react-native";
-import { Text } from "@/src/components/ui/text";
 import { Avatar } from "@/src/components/ui/avatar";
 import { Box } from "@/src/components/ui/box";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
+import { Center } from "@/src/components/ui/center";
 import { Heading } from "@/src/components/ui/heading";
 import { HStack } from "@/src/components/ui/hstack";
-import { VStack } from "@/src/components/ui/vstack";
-import { useColorScheme } from "@/src/hooks/useColorScheme";
-import {
-  ChartScatter,
-  GalleryHorizontal,
-  Image as ImageLucide,
-  Scan,
-  Sparkle,
-  UserRound,
-  Search,
-  ArrowRight,
-  BarChart3,
-  Camera,
-  Clock,
-  Settings,
-  Plus
-} from "lucide-react-native";
-import React, { useState } from "react";
-import { Button, ButtonText, ButtonIcon } from "@/src/components/ui/button";
-import { Center } from "@/src/components/ui/center";
 import { Icon } from "@/src/components/ui/icon";
 import { Image } from "@/src/components/ui/image";
-import { Skeleton } from "@/src/components/ui/skeleton";
+import { Text } from "@/src/components/ui/text";
+import { VStack } from "@/src/components/ui/vstack";
 import { getScanResultImageUriFromResultId } from "@/src/lib/imageUtil";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
+import {
+  ArrowRight,
+  BarChart3,
+  Camera,
+  ChartScatter,
+  Clock,
+  GalleryHorizontal,
+  Scan,
+  Sparkle,
+  UserRound
+} from "lucide-react-native";
+import React from "react";
+import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
-import { Pressable } from "react-native";
 
 export default function HomeScreen() {
   const { width, height } = Dimensions.get("window");
