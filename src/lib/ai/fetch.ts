@@ -1,4 +1,5 @@
 import axios from "axios";
+// import { fetch } from "expo/fetch";
 
 const API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY as string;
 const model = "google/gemma-2-9b-it:free";
