@@ -1,33 +1,23 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import "@/global.css";
+import "@/src/app/polyfills";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
+import { useColorScheme } from "@/src/hooks/useColorScheme";
+import { globalStore } from "@/src/state/globalState";
+import "@expo/metro-runtime";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "react-native-reanimated";
-import "@/src/app/polyfills"
-
-import { useColorScheme } from "@/src/hooks/useColorScheme";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { globalStore } from "@/src/state/globalState";
-import { Button, ButtonText } from "../components/ui/button";
-import { View } from "../components/ui/view";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-
-
   const systemTheme = useColorScheme(); // Detects 'light' or 'dark'
   // const [colorMode, setColorMode] = useState<"light" | "dark">(systemTheme || "light");
-
 
   // const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -38,26 +28,20 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
 
-
       //FOR DEBUG ONLY REMOVE IF CUSTOM BACKEND ADDRESS IS NOT NEEDED
       (async () => {
-        const storedAddress = await AsyncStorage.getItem('backendAddress');
+        const storedAddress = await AsyncStorage.getItem("backendAddress");
         if (storedAddress) {
           globalStore.backendAddress.set(storedAddress);
         }
       })();
       //FOR DEBUG ONLY REMOVE IF CUSTOM BACKEND ADDRESS IS NOT NEEDED
-
-
     }
   }, [loaded]);
 
   if (!loaded) {
     return null;
   }
-
-
-
 
   return (
     <GluestackUIProvider mode={"system"}>
@@ -70,7 +54,7 @@ export default function RootLayout() {
           name="screens/account"
           options={{
             title: "Account",
-            headerShown: true // Optional: Show or hide the header
+            headerShown: true, // Optional: Show or hide the header
           }}
         />
       </Stack>

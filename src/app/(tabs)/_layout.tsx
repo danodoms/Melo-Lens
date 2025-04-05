@@ -1,112 +1,177 @@
-import { Tabs } from "expo-router";
-import React from "react";
-import { Dimensions, Platform, StyleSheet, View } from "react-native";
-
 import { Colors } from "@/constants/Colors";
-import { HapticTab } from "@/src/components/HapticTab";
-import TabBarBackground from "@/src/components/ui/TabBarBackground";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { cssInterop } from "nativewind";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Box } from "@/src/components/ui/box";
-
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import {
+  TabList,
+  TabSlot,
+  TabTrigger,
+  TabTriggerSlotProps,
+  Tabs,
+} from "expo-router/ui";
+import React from "react";
+import { Pressable, View } from "react-native";
 
 export default function TabLayout() {
-  const { width } = Dimensions.get("window"); // Get device width
   const colorScheme = useColorScheme();
-
-  const styles = StyleSheet.create({
-    tabBarAndroid: {
-      position: "absolute", // Makes it float
-      paddingLeft: 16,
-      paddingRight: 16,
-      bottom: 16, // Moves it up while keeping space
-      backgroundColor: Colors[colorScheme ?? "light"].tint, // Fully transparent
-      borderRadius: 24, // Rounded edges
-      borderWidth: 0, // Ensure no border
-      borderColor: "transparent", // Explicitly set to transparent
-      height: 52, // Adjust height to fit rounded shape
-      // justifyContent: "center",
-      width: "60%", // 80% width for centering
-      alignSelf: "center", // Centers it
-      left: "60%",
-      transform: [{ translateX: -(width * 0.40) }], // Move left by half its width
-
-      // Ensure Android has no elevation
-      elevation: 0,
-
-      // Remove potential shadow effects
-      shadowColor: "transparent",
-      shadowOpacity: 0,
-      shadowOffset: { width: 0, height: 0 },
-      shadowRadius: 0,
-    },
-  });
+  const backgroundColor = Colors[colorScheme ?? "light"].background;
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].background,
-        headerShown: false,
-        // tabBarShowLabel: true,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          android: styles.tabBarAndroid,
-        }),
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarShowLabel: false,
-          title: "Home",
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <MaterialIcons name="home-filled" size={24} color={color} />
-            ) : (
-              <MaterialCommunityIcons name="home-variant-outline" size={24} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="scan"
-        options={{
-          tabBarShowLabel: false,
-          title: "Scan",
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <Ionicons name="scan" size={24} color={color} />
-            ) : (
-              <Ionicons name="scan-outline" size={24} color={color} />
-            ),
-        }}
-      />
-      < Tabs.Screen
-        name="results"
-        options={{
-          tabBarShowLabel: false,
-          title: "Results",
-          tabBarIcon: ({ color, focused }) =>
-            focused ? (
-              <Ionicons name="file-tray" size={24} color={color} />
-            ) : (
-              <Ionicons name="file-tray-outline" size={24} color={color} />
-            ),
-        }}
-      />
+    <Tabs>
+      <TabSlot />
+      <TabList className="px-4 absolute bottom-4 bg-primary-500 rounded-full translate-x-20">
+        <TabTrigger name="home" href="/" className="border-green-500" asChild>
+          <CustomTabButton
+            // className="border-red-500 border"
+            isFocus={
+              <MaterialIcons
+                name="home-filled"
+                size={24}
+                color={backgroundColor}
+              />
+            }
+            nonFocus={
+              <MaterialCommunityIcons
+                name="home-variant-outline"
+                size={24}
+                color={backgroundColor}
+              />
+            }
+          />
+        </TabTrigger>
 
-      {/* <Tabs.Screen
-        name="account"
-        options={{
-          tabBarShowLabel: false,
-          title: "Account",
-          tabBarIcon: ({ color }) => <UserRound color={color} />,
-        }}
-      /> */}
-    </Tabs >
+        <TabTrigger
+          name="scan"
+          href="/scan"
+          className="border-green-500"
+          asChild
+        >
+          <CustomTabButton
+            // className="border-red-500 border"
+            isFocus={<Ionicons name="scan" size={24} color={backgroundColor} />}
+            nonFocus={
+              <Ionicons name="scan-outline" size={24} color={backgroundColor} />
+            }
+          />
+        </TabTrigger>
+
+        <TabTrigger name="results" href="/results" asChild>
+          <CustomTabButton
+            // className="border-red-500 border"
+            isFocus={
+              <Ionicons name="file-tray" size={24} color={backgroundColor} />
+            }
+            nonFocus={
+              <Ionicons
+                name="file-tray-outline"
+                size={24}
+                color={backgroundColor}
+              />
+            }
+          />
+        </TabTrigger>
+      </TabList>
+    </Tabs>
   );
 }
+
+interface CustomTabButtonProps extends TabTriggerSlotProps {
+  isFocus: React.ReactNode;
+  nonFocus: React.ReactNode;
+  className?: string;
+}
+
+export const CustomTabButton = React.forwardRef<View, CustomTabButtonProps>(
+  ({ className, isFocused, isFocus, nonFocus, ...props }, ref) => {
+    return (
+      <Pressable
+        ref={ref}
+        {...props}
+        className={`border-red-500 px-8 py-4 ${className}`}
+      >
+        {isFocused ? isFocus : nonFocus}
+      </Pressable>
+    );
+  }
+);
+
+CustomTabButton.displayName = "CustomTabButton";
+
+// <Tabs
+//   screenOptions={{
+//     tabBarActiveTintColor: Colors[colorScheme ?? "light"].background,
+//     headerShown: false,
+//     // tabBarShowLabel: true,
+//     tabBarButton: HapticTab,
+//     tabBarBackground: TabBarBackground,
+//     tabBarStyle: Platform.select({
+//       android: styles.tabBarAndroid,
+//     }),
+//   }}
+// >
+//   <Tabs.Screen
+//     name="index"
+//     options={{
+//       tabBarShowLabel: false,
+//       title: "Home",
+//       tabBarIcon: ({ color, focused }) =>
+//         focused ? (
+//           <MaterialIcons name="home-filled" size={24} color={color} />
+//         ) : (
+//           <MaterialCommunityIcons name="home-variant-outline" size={24} color={color} />
+//         ),
+//     }}
+//   />
+//   <Tabs.Screen
+//     name="scan"
+//     options={{
+//       tabBarShowLabel: false,
+//       title: "Scan",
+//       tabBarIcon: ({ color, focused }) =>
+//         focused ? (
+//           <Ionicons name="scan" size={24} color={color} />
+//         ) : (
+//           <Ionicons name="scan-outline" size={24} color={color} />
+//         ),
+//     }}
+//   />
+//   < Tabs.Screen
+//     name="results"
+//     options={{
+//       tabBarShowLabel: false,
+//       title: "Results",
+//       tabBarIcon: ({ color, focused }) =>
+//         focused ? (
+//           <Ionicons name="file-tray" size={24} color={color} />
+//         ) : (
+//           <Ionicons name="file-tray-outline" size={24} color={color} />
+//         ),
+//     }}
+//   />
+
+//   {/* <Tabs.Screen
+//     name="account"
+//     options={{
+//       tabBarShowLabel: false,
+//       title: "Account",
+//       tabBarIcon: ({ color }) => <UserRound color={color} />,
+//     }}
+//   /> */}
+// </Tabs >
+// <Tabs>
+//   <TabSlot />
+//   <TabList className="bg-tertiary-500">
+//     <TabTrigger name="home" href="/">
+//       <Button>
+//         <ButtonText>Home</ButtonText>
+//       </Button>
+//       {/* <Text>Home</Text> */}
+//     </TabTrigger>
+//     <TabTrigger name="article" href="/scan">
+//       <Text>Article</Text>
+//     </TabTrigger>
+//   </TabList>
+// </Tabs>

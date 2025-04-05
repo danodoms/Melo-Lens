@@ -1,11 +1,7 @@
 import { melonDiseaseClasses } from "@/assets/model/tflite/melon-disease/melon-disease-classes";
-import ScanResultDrawer from "@/src/components/scan-result-drawer";
+import ScanResultDrawer from "@/src/components/scan-result-drawer/";
 import { Box } from "@/src/components/ui/box";
-import {
-  Button,
-  ButtonIcon,
-  ButtonText
-} from "@/src/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { Center } from "@/src/components/ui/center";
 import { HStack } from "@/src/components/ui/hstack";
 import { Text } from "@/src/components/ui/text";
@@ -31,21 +27,17 @@ import {
   HelpCircle,
   Images,
   RefreshCw,
-  SwitchCamera
+  SwitchCamera,
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
-import {
-  loadTensorflowModel
-} from "react-native-fast-tflite";
+import { loadTensorflowModel } from "react-native-fast-tflite";
 import {
   Camera,
   useCameraDevice,
   useCameraPermission,
   type CameraPosition,
 } from "react-native-vision-camera";
-
-
 
 export default function ScanScreen() {
   const {
@@ -71,14 +63,14 @@ export default function ScanScreen() {
   const [isResultSaved, setIsResultSaved] = useState<boolean>(false);
   const device = useCameraDevice(cameraFacing);
   const [isXaiEnabled, setXaiEnabled] = useState(false);
-  const [isDrawerOpen, setDrawerOpen] = useState(false)
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const backendAddress = use$(globalStore.backendAddress);
 
   const API_URL = `https://${backendAddress}/generate-heatmap/`;
   const { showToast } = useCustomToast();
-  const { addResult } = useSupaLegend()
-  const syncLocalImagesToRemoteDatabase = useSupabase()
+  const { addResult } = useSupaLegend();
+  const syncLocalImagesToRemoteDatabase = useSupabase();
 
   // Ensure TensorFlow is ready before classifying
   useEffect(() => {
@@ -118,12 +110,10 @@ export default function ScanScreen() {
     setCameraFacing((current) => (current === "back" ? "front" : "back"));
   }
 
-
   // 🔹 Function for local (offline) inference
   const runLocalInference = (imageUri: string) => {
     runModelPrediction(imageUri, "float32", melonDiseaseClasses);
   };
-
 
   // 🔹 Function for online (XAI API) inference
   const runOnlineInference = async (imageUri: string) => {
@@ -148,12 +138,11 @@ export default function ScanScreen() {
     });
   };
 
-
   const processImageAndClassify = async (imageUri: string) => {
     // Reset predictions and open the result drawer
-    setIsResultSaved(false)
-    resetPrediction()
-    setXaiHeatmapUri(null)
+    setIsResultSaved(false);
+    resetPrediction();
+    setXaiHeatmapUri(null);
     setDrawerOpen(true);
 
     // Resize the image to fit the model requirements
@@ -168,8 +157,7 @@ export default function ScanScreen() {
     isXaiEnabled
       ? runOnlineInference(manipulatedImage.uri)
       : runLocalInference(manipulatedImage.uri);
-  }
-
+  };
 
   const captureImage = async () => {
     if (!model) {
@@ -194,9 +182,9 @@ export default function ScanScreen() {
     await processImageAndClassify("file://" + photo.path); // Process the captured image
   };
 
-
   const importImageAndClassify = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted) {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -221,8 +209,8 @@ export default function ScanScreen() {
     if (!confidence) return console.log("No confidence");
 
     addResult(capturedImageUri, classification, confidence);
-    setDrawerOpen(false)
-    setIsResultSaved(true)
+    setDrawerOpen(false);
+    setIsResultSaved(true);
 
     showToast({
       title: "Success!",
@@ -231,17 +219,19 @@ export default function ScanScreen() {
       type: "success",
       // actionLabel: "Close",
       onActionPress: () => console.log("Closed"),
-    })
+    });
 
     if (!isOffline) {
-      console.log("User is online, attempting to sync results with remote database")
-      syncLocalImagesToRemoteDatabase()
+      console.log(
+        "User is online, attempting to sync results with remote database"
+      );
+      syncLocalImagesToRemoteDatabase();
     }
   }
 
-
-
-  function RenderButtonComponent({ className }: Readonly<{ className?: string }>) {
+  function RenderButtonComponent({
+    className,
+  }: Readonly<{ className?: string }>) {
     return (
       <VStack className={`p-4 ${className}`}>
         <HStack className="gap-4 mb-8 flex justify-center items-center w-full ">
@@ -251,36 +241,60 @@ export default function ScanScreen() {
             className="rounded-full"
             onPress={() => setXaiEnabled(!isXaiEnabled)}
           >
-            <ButtonText>{isXaiEnabled ? "Disable XAI" : "Enable XAI"}</ButtonText>
+            <ButtonText>
+              {isXaiEnabled ? "Disable XAI" : "Enable XAI"}
+            </ButtonText>
             <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} />
           </Button>
 
           {classification && (
-            <Button size="md" variant="solid" className="rounded-full" onPress={() => setDrawerOpen(true)}>
+            <Button
+              size="md"
+              variant="solid"
+              className="rounded-full"
+              onPress={() => setDrawerOpen(true)}
+            >
               {/*<ButtonText >Show Drawer</ButtonText>*/}
               <ButtonIcon as={ChevronUp} />
             </Button>
           )}
-
-
         </HStack>
 
         <HStack className="mb-4 flex justify-evenly items-center border-red-500">
-          <Button size="xl" variant="solid" className="rounded-full p-4 bg-background-0" onPress={importImageAndClassify} >
+          <Button
+            size="xl"
+            variant="solid"
+            className="rounded-full p-4 bg-background-0"
+            onPress={importImageAndClassify}
+          >
             <ButtonIcon size="xl" as={Images} className="text-primary-500" />
           </Button>
 
           <Pressable onPress={captureImage}>
             <Center className="size-20 rounded-full border-4 border-white ">
               <Center className="size-16 rounded-full bg-tertiary-50 opacity-50 absolute" />
-              <Ionicons name="leaf-outline" size={24} color="white" className="absolute" />
+              <Ionicons
+                name="leaf-outline"
+                size={24}
+                color="white"
+                className="absolute"
+              />
               {/* <MaterialCommunityIcons name="cube-scan" size={24} color="white" /> */}
               {/* <MaterialCommunityIcons name="magnify-scan" size={24} color="white" /> */}
             </Center>
           </Pressable>
 
-          <Button size="xl" variant="solid" className="rounded-full p-4 bg-background-0" onPress={toggleCameraFacing}>
-            <ButtonIcon size="xl" as={SwitchCamera} className="text-primary-500" />
+          <Button
+            size="xl"
+            variant="solid"
+            className="rounded-full p-4 bg-background-0"
+            onPress={toggleCameraFacing}
+          >
+            <ButtonIcon
+              size="xl"
+              as={SwitchCamera}
+              className="text-primary-500"
+            />
           </Button>
         </HStack>
       </VStack>
@@ -288,9 +302,7 @@ export default function ScanScreen() {
   }
 
   return (
-    <VStack
-      className="bg-green h-full relative border-red-500 justify-end"
-    >
+    <VStack className="bg-green h-full relative border-red-500 justify-end">
       <Camera
         device={device}
         style={{
@@ -303,15 +315,16 @@ export default function ScanScreen() {
         isActive={true}
         ref={cameraRef}
         photo={true}
-      /*  frameProcessor={frameProcessor}*/
+        /*  frameProcessor={frameProcessor}*/
       />
 
       {/*FOR DEVELOPERS*/}
       <VStack className="w-full justify-center mb-4 opacity-50 pt-20 ">
-        <Text className="font-medium text-xs text-center">XAI is using this API route, modify it in accounts page</Text>
+        <Text className="font-medium text-xs text-center">
+          XAI is using this API route, modify it in accounts page
+        </Text>
         <Text className="text-xs text-center">{API_URL}</Text>
       </VStack>
-
 
       <RenderButtonComponent className="justify-self-end border-green-500" />
 

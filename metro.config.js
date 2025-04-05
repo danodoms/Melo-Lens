@@ -7,6 +7,11 @@ const config = getDefaultConfig(__dirname);
 // Add '.bin' and '.tflite' support for assets
 config.resolver.assetExts.push("bin", "tflite", "lottie");
 
+// // Explicitly add watch folder for 'scan-result-drawer'
+// config.watchFolders = [
+//   path.resolve(__dirname, "src/components/scan-result-drawer"),
+// ];
+
 module.exports = withNativeWind(config, {
   input: "./global.css",
   resolver: {
