@@ -16,18 +16,19 @@ import { AiPrompts } from "@/src/components/scan-result-drawer/components/ai-pro
 import { renderConfidenceRemark } from "../confidence-remark";
 import { renderSaveResultComponent } from "../components/save-result-button";
 import { AiSession, DrawerState } from "../types";
-import { Button, ButtonText } from "../../ui/button";
+import { Button, ButtonText, ButtonIcon } from "../../ui/button";
+import { HStack } from "../../ui/hstack";
+import { Icon } from "../../ui/icon";
+import { Sparkles } from "lucide-react-native";
 
 type ScanResultViewProps = {
   drawerState: DrawerState;
-  setAiSession: (session: AiSession) => void;
-  setIsAiPageShown: (shown: boolean) => void;
+  onAskAiAction: () => void;
 };
 
 export const ScanResultView: React.FC<ScanResultViewProps> = ({
   drawerState,
-  setAiSession,
-  setIsAiPageShown,
+  onAskAiAction,
 }) => {
   const [isXaiHeatmapShown, setIsXaiHeatmapShown] = useState(false);
   const isPredictionDone =
@@ -100,13 +101,14 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({
             )}
 
             {hasResults && (
-              <AiPrompts
-                drawerState={drawerState}
-                setAiSession={(aiSession: AiSession) => {
-                  setIsAiPageShown(true);
-                  setAiSession(aiSession);
-                }}
-              />
+              <Button
+                className="gap-2 items-center mb-2 w-full mt-8 h-16 rounded-xl"
+                variant="outline"
+                onPress={() => onAskAiAction()}
+              >
+                <ButtonIcon as={Sparkles} className="text-primary-500" />
+                <ButtonText className="font-bold">Ask AI</ButtonText>
+              </Button>
             )}
           </Center>
         )}

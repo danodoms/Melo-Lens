@@ -4,20 +4,15 @@ import {
   DrawerContent,
 } from "@/src/components/ui/drawer";
 import React, { useState } from "react";
+import { DrawerState } from "./types";
 import { AiSessionView } from "./views/ai-session-view";
 import { ScanResultView } from "./views/scan-result-view";
-import { AiSession, DrawerState } from "./types";
 
 type ScanResultDrawerProps = {
   drawerState: DrawerState;
 };
 
 const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
-  const [aiSession, setAiSession] = useState<AiSession>({
-    prompt: "",
-    response: "",
-    isGenerating: false,
-  });
   const [isAiPageShown, setIsAiPageShown] = useState(false);
 
   return (
@@ -33,14 +28,12 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
         {isAiPageShown ? (
           <AiSessionView
             drawerState={drawerState}
-            aiSession={aiSession}
             onBack={() => setIsAiPageShown(false)}
           />
         ) : (
           <ScanResultView
             drawerState={drawerState}
-            setAiSession={setAiSession}
-            setIsAiPageShown={setIsAiPageShown}
+            onAskAiAction={() => setIsAiPageShown(true)}
           />
         )}
       </DrawerContent>
