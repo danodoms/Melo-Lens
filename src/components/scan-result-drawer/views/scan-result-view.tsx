@@ -20,6 +20,7 @@ import { Button, ButtonText, ButtonIcon } from "../../ui/button";
 import { HStack } from "../../ui/hstack";
 import { Icon } from "../../ui/icon";
 import { Sparkles } from "lucide-react-native";
+import tw from "twrnc";
 
 type ScanResultViewProps = {
   drawerState: DrawerState;
@@ -102,12 +103,18 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({
 
             {hasResults && (
               <Button
-                className="gap-2 items-center mb-2 w-full mt-8 h-16 rounded-xl"
+                className="gap-2 items-center mb-2 w-full mt-8 h-16 rounded-full border-accent-500 shadow-2xl border-4 shadow-accent-500 "
+                style={tw``}
                 variant="outline"
                 onPress={() => onAskAiAction()}
               >
-                <ButtonIcon as={Sparkles} className="text-primary-500" />
-                <ButtonText className="font-bold">Ask AI</ButtonText>
+                <ButtonIcon
+                  as={Sparkles}
+                  className="shadow shadow-primary-500 rounded-full"
+                />
+                <ButtonText className="font-bold rounded-full">
+                  Ask AI
+                </ButtonText>
               </Button>
             )}
           </Center>

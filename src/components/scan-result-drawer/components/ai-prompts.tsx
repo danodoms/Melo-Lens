@@ -17,13 +17,13 @@ export const AiPrompts: React.FC<AiPromptsProps> = ({
 }) => {
   return (
     <VStack className="w-full mt-8">
-      <HStack className="max-h-64 flex-wrap gap-2 pb-16 overflow-y-auto border">
+      <HStack className="max-h-64 flex-wrap gap-2 pb-16 overflow-y-auto">
         {prompts.map((prompt, index) => (
           <Button
             variant="link"
             key={prompt + index}
             onPress={() => onAiPrompt(prompt)}
-            className="whitespace-nowrap justify-start bg-tertiary-500 px-4 rounded-full rounded-tl-none"
+            className="whitespace-nowrap justify-start bg-accent-0 px-4 rounded-full rounded-tl-none"
           >
             <ButtonText className="text-background-0">{prompt}</ButtonText>
           </Button>

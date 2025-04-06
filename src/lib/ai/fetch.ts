@@ -1,5 +1,7 @@
 import axios from "axios";
 import { fetch as expoFetch } from "expo/fetch";
+import { throttle } from "lodash";
+import { startTransition } from "react";
 
 const API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY as string;
 const model = "google/gemma-2-9b-it:free";
@@ -77,6 +79,15 @@ export const getAiResponseStream = async (prompt, onData) => {
 };
 
 export async function getAiResponseStream2(prompt, onData) {
+  // Track total accumulated content between throttled calls
+  let accumulatedContent = "";
+
+  // Create a throttled version of onData using lodash
+  const throttledOnData = throttle((content) => {
+    onData(content);
+    accumulatedContent = ""; // Reset accumulated content after sending
+  }, 300);
+
   const response = await expoFetch(
     "https://openrouter.ai/api/v1/chat/completions",
     {
@@ -124,13 +135,24 @@ export async function getAiResponseStream2(prompt, onData) {
             const parsed = JSON.parse(data);
             const content = parsed.choices[0]?.delta?.content;
             if (content) {
-              onData(content);
+              // Accumulate content
+              accumulatedContent += content;
+
+              // Call the throttled function with the accumulated content
+
+              startTransition(() => throttledOnData(accumulatedContent));
             }
           } catch (e) {
             console.error("Error parsing JSON chunk:", e);
           }
         }
       }
+    }
+
+    // Ensure any remaining accumulated content is sent
+    // Use .flush() to call any pending throttled callbacks
+    if (accumulatedContent) {
+      throttledOnData.flush();
     }
   } finally {
     reader.cancel();

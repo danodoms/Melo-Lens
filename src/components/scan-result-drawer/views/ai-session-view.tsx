@@ -5,7 +5,7 @@ import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { Bot, LoaderCircle, MoveLeft, Sparkles } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import Markdown from "react-native-markdown-display";
 import { HStack } from "../../ui/hstack";
 import { AiSession, DrawerState } from "./../types";
@@ -17,6 +17,7 @@ import { StyleSheet } from "react-native";
 import { Center } from "../../ui/center";
 import { getAiResponseStream2 } from "@/src/lib/ai/fetch";
 import { AiPrompts } from "../components/ai-prompts";
+import { throttle } from "lodash";
 
 type AiSessionViewProps = {
   drawerState: DrawerState;
@@ -37,6 +38,8 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
 
   const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
 
+  const [isPending, startTransition] = useTransition();
+
   const defaultPrompts = [
     "What treatments work best for this?",
     "How serious is this issue?",
@@ -55,6 +58,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     const fullPrompt = `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable.`;
 
     console.log("sdjsadjksdsas");
+
     setAiSession({
       prompt,
       response: "Generating response...",
@@ -64,6 +68,12 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     setShowPrompts(false); // HIDE PROMPTS when starting generation
 
     let responseStream = "";
+
+    // Create a throttled update function
+    // const throttledAiResponse = throttle(newMessage => {
+    //   setMessage(newMessage);
+    // }, 50); // Only update at most every 50ms
+
     getAiResponseStream2(fullPrompt, (chunk: string) =>
       setAiSession({
         prompt,
@@ -71,6 +81,16 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
         isGenerating: false,
       })
     );
+
+    // getAiResponseStream2(fullPrompt, (chunk: string) =>
+    //   startTransition(() => {
+    //     setAiSession((prevSession) => ({
+    //       ...prevSession,
+    //       response: (responseStream += chunk),
+    //       isGenerating: false,
+    //     }));
+    //   })
+    // );
   };
 
   const resetSession = () => {
@@ -86,12 +106,11 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     <>
       <DrawerHeader className="flex flex-wrap gap-2 items-center">
         <VStack>
-          {!showPrompts && (
-            <HStack className="gap-2 items-center opacity-50">
-              <Icon as={Sparkles} className="text-primary-500" />
-              <Text className="font-bold">Ask AI</Text>
-            </HStack>
-          )}
+          <HStack className="gap-2 items-center opacity-50">
+            <Icon as={Sparkles} className="text-primary-500" />
+            <Text className="font-bold">Ask AI</Text>
+          </HStack>
+
           <Heading size="lg">{aiSession.prompt}</Heading>
         </VStack>
 
