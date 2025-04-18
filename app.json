@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "npk-classify-v2",
-    "slug": "npk-classify-v2",
+    "name": "Melo Lens",
+    "slug": "melo-lens",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -67,8 +67,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "858c3341-bdeb-434f-a909-b025685c6fc4"
+        "projectId": "c0d1ae75-ce76-43af-a125-c2f5571d7593"
       }
-    }
+    },
+    "owner": "danodoms"
   }
 }
