@@ -24,9 +24,12 @@ import { observable, observe } from "@legendapp/state";
 import { enableReactTracking } from "@legendapp/state/config/enableReactTracking";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { Center } from "@/src/components/ui/center";
-import { Icon } from "@/src/components/ui/icon"
+import { Icon } from "@/src/components/ui/icon";
 import { Brain, BrainCog, RefreshCw, Trash, X } from "lucide-react-native";
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import {
+  GestureHandlerRootView,
+  Swipeable,
+} from "react-native-gesture-handler";
 
 export default function ResultsScreen() {
   const { results, clearResults } = useSupaLegend();
@@ -74,14 +77,14 @@ export default function ResultsScreen() {
 
   // Example usage
   const timestamp = "2025-01-02 04:47:49.176207+00";
-  console.log(formatTimestamp(timestamp, true));  // With tim
+  console.log(formatTimestamp(timestamp, true)); // With tim
 
   if (!results.length) {
     return (
       <Center className="gap-4 pt-12 bg-background-0 border-green-500 h-full">
         <Text className="opacity-50 text-center text-lg">No results</Text>
       </Center>
-    )
+    );
   }
 
   const renderRightActions = (id: string, onDelete: (id: string) => void) => {
@@ -98,30 +101,27 @@ export default function ResultsScreen() {
           <ButtonText>Delete</ButtonText>
         </Button>
       </Center>
-
     );
   };
 
   // Delete result from the state and file system
   const onDelete = async (id: string) => {
-    console.log("test")
+    console.log("test");
   };
-
 
   return (
     <VStack className="gap-4 pt-20 bg-background-0 border-green-500 h-full">
       <ScrollView className="flex gap-4">
-        <GestureHandlerRootView >
+        <GestureHandlerRootView>
           {results.map((result) => (
-
             <Swipeable
               key={result.id}
               renderRightActions={() => renderRightActions(result.id, onDelete)} // Swipe actions
-            /*   onSwipeableOpen={direction:"right" swipeable: ()=>setIsItemSwiped(true)}*/
+              /*   onSwipeableOpen={direction:"right" swipeable: ()=>setIsItemSwiped(true)}*/
             >
-              <HStack className="gap-4 border-red-500 px-4 py-2 rounded-lg items-center">
+              <HStack className="gap-4 px-4 py-2 rounded-lg items-center">
                 <Image
-                  className="rounded-md border-white-50 border-2"
+                  className="rounded-md"
                   source={{
                     uri: getScanResultImageUriFromResultId(result.id),
                   }}
@@ -129,21 +129,24 @@ export default function ResultsScreen() {
                 />
 
                 <VStack className="border-green-500">
-                  <Text className="font-bold text-lg">{result.classification}</Text>
-                  <Text className="opacity-50">{result.confidence}% Confidence</Text>
+                  <Text className="font-bold text-lg">
+                    {result.classification}
+                  </Text>
+                  <Text className="opacity-50">
+                    {result.confidence}% Confidence
+                  </Text>
                   <Text className="opacity-50 text-sm">
-                    {result.created_at && formatTimestamp(result.created_at || '', false)}
+                    {result.created_at &&
+                      formatTimestamp(result.created_at || "", false)}
                   </Text>
 
                   {/*  <Text className="opacity-50 text-sm">Swipe right to delete</Text>*/}
                 </VStack>
               </HStack>
             </Swipeable>
-
           ))}
         </GestureHandlerRootView>
       </ScrollView>
     </VStack>
-
   );
 }

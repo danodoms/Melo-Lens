@@ -67,7 +67,7 @@ export default function ScanScreen() {
 
   const backendAddress = use$(globalStore.backendAddress);
 
-  const API_URL = `https://${backendAddress}/generate-heatmap/`;
+  const API_URL = `${backendAddress}/generate-heatmap/`;
   const { showToast } = useCustomToast();
   const { addResult } = useSupaLegend();
   const syncLocalImagesToRemoteDatabase = useSupabase();
@@ -82,7 +82,7 @@ export default function ScanScreen() {
 
   const loadModel = async () => {
     const tfliteModel = await loadTensorflowModel(
-      require("@/assets/model/tflite/melon-disease/melon-disease-v2.tflite")
+      require("@/assets/model/tflite/melon-disease/melon-disease-v3-224.tflite")
     );
     setModel(tfliteModel);
   };
@@ -110,12 +110,35 @@ export default function ScanScreen() {
     setCameraFacing((current) => (current === "back" ? "front" : "back"));
   }
 
-  // 🔹 Function for local (offline) inference
+  /**
+   * Function for local (offline) inference
+   * Process a captured or selected image through the inference pipeline
+   *
+   * This function handles the processing and classification of images:
+   * 1. Resets prediction state and opens the result drawer
+   * 2. Resizes the image to 224x224 (model input size)
+   * 3. Routes to appropriate inference method based on XAI setting
+   *
+   * @param imageUri - The URI of the image to be processed
+   * @returns Promise<void>
+   */
   const runLocalInference = (imageUri: string) => {
     runModelPrediction(imageUri, "float32", melonDiseaseClasses);
   };
 
-  // 🔹 Function for online (XAI API) inference
+  /**
+   * Function for online (XAI API) inference
+   *
+   * Processes an image through the external XAI API to get classification results
+   * and explainability heatmap visualization:
+   * 1. Sends the image to the configured API endpoint
+   * 2. Updates state with classification results from the server
+   * 3. Stores the heatmap visualization URI provided by the API
+   * 4. Handles errors through the toast notification system
+   *
+   * @param imageUri - The URI of the image to be analyzed
+   * @returns Promise<void>
+   */
   const runOnlineInference = async (imageUri: string) => {
     await fetchXaiAnalysis({
       imageUri,
@@ -123,6 +146,45 @@ export default function ScanScreen() {
       onSuccess: (confidence, label, heatmapUri) => {
         setConfidence(parseFloat(Number(confidence).toFixed(2)));
         setClassification(label);
+        setXaiHeatmapUri(heatmapUri);
+      },
+      onError: (error) => {
+        console.error("XAI API Error:", error);
+        showToast({
+          title: "XAI Error",
+          message: error.message,
+          icon: HelpCircle,
+          type: "error",
+          onActionPress: () => console.log("Retry clicked"),
+        });
+      },
+    });
+  };
+
+  /**
+   * Function for hybrid (local+XAI) inference
+   *
+   * Combines the benefits of both local inference and XAI analysis:
+   * 1. Retrieves the explainability heatmap from the XAI API for visualization
+   * 2. Uses the local model for classification for faster and offline-capable results
+   * 3. Provides visual explanation through the heatmap while maintaining performance
+   *
+   * This approach is particularly useful when:
+   * - You need explainability but prefer local model accuracy
+   * - You want to compare local model results with XAI visualization
+   * - Connection to the server is unreliable but XAI is still desired when available
+   *
+   * @param imageUri - The URI of the image to be analyzed
+   * @returns Promise<void>
+   */
+  const runHybridInference = async (imageUri: string) => {
+    await fetchXaiAnalysis({
+      imageUri,
+      apiUrl: API_URL,
+      onSuccess: (confidence, label, heatmapUri) => {
+        // setConfidence(parseFloat(Number(confidence).toFixed(2)));
+        // setClassification(label);
+        runModelPrediction(imageUri, "float32", melonDiseaseClasses);
         setXaiHeatmapUri(heatmapUri);
       },
       onError: (error) => {
@@ -148,14 +210,15 @@ export default function ScanScreen() {
     // Resize the image to fit the model requirements
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       imageUri,
-      [{ resize: { width: 128, height: 128 } }],
+      [{ resize: { width: 224, height: 224 } }],
       { format: SaveFormat.JPEG, base64: true }
     );
     setCapturedImageUri(manipulatedImage.uri);
 
     // Choose inference method explicitly
     isXaiEnabled
-      ? runOnlineInference(manipulatedImage.uri)
+      ? // ? runOnlineInference(manipulatedImage.uri)
+        runHybridInference(manipulatedImage.uri)
       : runLocalInference(manipulatedImage.uri);
   };
 
@@ -241,10 +304,10 @@ export default function ScanScreen() {
             className="rounded-full"
             onPress={() => setXaiEnabled(!isXaiEnabled)}
           >
-            <ButtonText>
-              {isXaiEnabled ? "Disable XAI" : "Enable XAI"}
+            <ButtonText className="">
+              {isXaiEnabled ? "AI Focus Shown" : "AI Focus Hidden"}
             </ButtonText>
-            <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} />
+            <ButtonIcon as={isXaiEnabled ? BrainCog : Brain} className="" />
           </Button>
 
           {classification && (
@@ -320,10 +383,10 @@ export default function ScanScreen() {
 
       {/*FOR DEVELOPERS*/}
       <VStack className="w-full justify-center mb-4 opacity-50 pt-20 ">
-        <Text className="font-medium text-xs text-center">
+        <Text className="font-medium text-xs text-center text-white">
           XAI is using this API route, modify it in accounts page
         </Text>
-        <Text className="text-xs text-center">{API_URL}</Text>
+        <Text className="text-xs text-center text-white">{API_URL}</Text>
       </VStack>
 
       <RenderButtonComponent className="justify-self-end border-green-500" />

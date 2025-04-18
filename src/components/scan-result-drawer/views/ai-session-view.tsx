@@ -1,23 +1,22 @@
+import { Colors } from "@/constants/Colors";
 import { Box } from "@/src/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
 import { DrawerBody, DrawerHeader } from "@/src/components/ui/drawer";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
-import { Bot, LoaderCircle, MoveLeft, Sparkles } from "lucide-react-native";
-import React, { useState, useTransition } from "react";
-import Markdown from "react-native-markdown-display";
-import { HStack } from "../../ui/hstack";
-import { AiSession, DrawerState } from "./../types";
-import { Icon } from "../../ui/icon";
-import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
+import { getAiResponseStream } from "@/src/lib/ai/fetch";
 import LottieView from "lottie-react-native";
+import { MoveLeft, Sparkles } from "lucide-react-native";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
+import Markdown from "react-native-markdown-display";
 import { Center } from "../../ui/center";
-import { getAiResponseStream2 } from "@/src/lib/ai/fetch";
+import { HStack } from "../../ui/hstack";
+import { Icon } from "../../ui/icon";
 import { AiPrompts } from "../components/ai-prompts";
-import { throttle } from "lodash";
+import { AiSession, DrawerState } from "./../types";
 
 type AiSessionViewProps = {
   drawerState: DrawerState;
@@ -38,8 +37,6 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
 
   const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
 
-  const [isPending, startTransition] = useTransition();
-
   const defaultPrompts = [
     "What treatments work best for this?",
     "How serious is this issue?",
@@ -56,7 +53,6 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
   const handleAiPrompt = (prompt: string) => {
     const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`;
     const fullPrompt = `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable.`;
-
     console.log("sdjsadjksdsas");
 
     setAiSession({
@@ -69,28 +65,13 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
 
     let responseStream = "";
 
-    // Create a throttled update function
-    // const throttledAiResponse = throttle(newMessage => {
-    //   setMessage(newMessage);
-    // }, 50); // Only update at most every 50ms
-
-    getAiResponseStream2(fullPrompt, (chunk: string) =>
+    getAiResponseStream(fullPrompt, (chunk: string) =>
       setAiSession({
         prompt,
         response: (responseStream += chunk),
         isGenerating: false,
       })
     );
-
-    // getAiResponseStream2(fullPrompt, (chunk: string) =>
-    //   startTransition(() => {
-    //     setAiSession((prevSession) => ({
-    //       ...prevSession,
-    //       response: (responseStream += chunk),
-    //       isGenerating: false,
-    //     }));
-    //   })
-    // );
   };
 
   const resetSession = () => {

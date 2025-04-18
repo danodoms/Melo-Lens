@@ -9,6 +9,7 @@ import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { getScanResultImageUriFromResultId } from "@/src/lib/imageUtil";
+import tw from "twrnc";
 import { useSupaLegend } from "@/src/utils/supalegend/useSupaLegend";
 import { FlashList } from "@shopify/flash-list";
 import { Link } from "expo-router";
@@ -21,9 +22,10 @@ import {
   GalleryHorizontal,
   Scan,
   Sparkle,
-  UserRound
+  UserRound,
 } from "lucide-react-native";
 import React from "react";
+import { View } from "react-native";
 import { Dimensions } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 
@@ -41,7 +43,7 @@ export default function HomeScreen() {
               Welcome to
             </Text> */}
             <HStack className="items-center gap-1">
-              <Heading size="2xl" className="text-tertiary-500">
+              <Heading size="2xl" className="text-tertiary-500 font-extrabold">
                 Melo
               </Heading>
               <Heading size="2xl" className="text-secondary-500">
@@ -53,10 +55,7 @@ export default function HomeScreen() {
 
           <HStack className="gap-3">
             <Link href="/screens/account">
-              <Avatar
-                size="md"
-                className="bg-secondary rounded-xl"
-              >
+              <Avatar size="md" className="bg-secondary rounded-xl">
                 <Icon as={UserRound}></Icon>
               </Avatar>
             </Link>
@@ -84,20 +83,13 @@ export default function HomeScreen() {
           {/* Stat Card 1 */}
           <Box className="flex-1 bg-background-50 rounded-2xl p-4">
             <VStack>
-              <Text className="text-xs ">
-                Total Scans
-              </Text>
-              <Heading
-                size="xl"
-                className=" my-1"
-              >
+              <Text className="text-xs ">Total Scans</Text>
+              <Heading size="xl" className=" my-1">
                 {results.length}
               </Heading>
               <HStack className="items-center">
-                <Icon as={Clock} className="" size={12} />
-                <Text className="text-[11px] ml-1">
-                  Last 7 days
-                </Text>
+                <Icon as={Clock} className="size-2" />
+                <Text className="text-[11px] ml-1">Last 7 days</Text>
               </HStack>
             </VStack>
           </Box>
@@ -105,20 +97,13 @@ export default function HomeScreen() {
           {/* Stat Card 2 */}
           <Box className="flex-1 bg-background-50 rounded-2xl p-4">
             <VStack>
-              <Text className=" text-xs">
-                Average Confidence
-              </Text>
-              <Heading
-                size="xl"
-                className="my-1"
-              >
+              <Text className=" text-xs">Average Confidence</Text>
+              <Heading size="xl" className="my-1">
                 96%
               </Heading>
               <HStack className="items-center">
                 <Box className="size-3 rounded-full bg-tertiary-500 mr-1" />
-                <Text className=" text-[11px]">
-                  High confidence
-                </Text>
+                <Text className=" text-[11px]">High confidence</Text>
               </HStack>
             </VStack>
           </Box>
@@ -141,17 +126,14 @@ export default function HomeScreen() {
             data={topClassifications}
             renderItem={({ item, index }) => (
               <Box
-                className={`p-3 ${index === topClassifications.length - 1 ? "" : ""
-                  }`}
+                className={`p-3 ${
+                  index === topClassifications.length - 1 ? "" : ""
+                }`}
               >
                 <HStack className="items-center justify-between">
                   <HStack className="items-center gap-3">
-                    <Box
-                      className="w-8 h-8 rounded-lg justify-center items-center"
-                    >
-                      <Text className="font-bold">
-                        {index + 1}
-                      </Text>
+                    <Box className="w-8 h-8 rounded-lg justify-center items-center">
+                      <Text className="font-bold">{index + 1}</Text>
                     </Box>
 
                     <VStack>
@@ -159,14 +141,13 @@ export default function HomeScreen() {
                         {item.classification}
                       </Text>
                       <Text className=" text-xs">
-                        {Math.round(item.count / results.length * 100)}% of total
+                        {Math.round((item.count / results.length) * 100)}% of
+                        total
                       </Text>
                     </VStack>
                   </HStack>
 
-                  <Text
-                    className="font-bold text-tertiary-500 text-base mr-1"
-                  >
+                  <Text className="font-bold text-tertiary-500 text-base mr-1">
                     {item.count}
                   </Text>
                 </HStack>
@@ -177,9 +158,7 @@ export default function HomeScreen() {
               <Center className="p-4 border-red-500 h-full">
                 <VStack className="items-center gap-2 justify-center  border-red-500 flex">
                   <Icon as={ChartScatter} className="" size={24} />
-                  <Text className="">
-                    No data to analyze
-                  </Text>
+                  <Text className="">No data to analyze</Text>
                 </VStack>
               </Center>
             }
@@ -197,9 +176,7 @@ export default function HomeScreen() {
             </Heading>
           </HStack>
 
-          <Text className=" text-xs">
-            {results.length} Total
-          </Text>
+          <Text className=" text-xs">{results.length} Total</Text>
         </HStack>
 
         <Box className="bg-background-50 rounded-2xl overflow-hidden flex-1">
@@ -224,7 +201,7 @@ export default function HomeScreen() {
                   {/* Dark overlay for text visibility */}
                   <Box
                     style={{
-                      position: 'absolute',
+                      position: "absolute",
                       bottom: 0,
                       left: 0,
                       right: 0,
@@ -234,38 +211,38 @@ export default function HomeScreen() {
 
                   <VStack
                     style={{
-                      position: 'absolute',
+                      position: "absolute",
                       bottom: 16,
                       left: 16,
-                      right: 16
+                      right: 16,
                     }}
                   >
-                    <HStack className="justify-between items-center">
+                    <HStack
+                      className="justify-between items-center w-full px-4 py-2 rounded-lg bg-background-50"
+                      style={tw`bg-opacity-80`}
+                    >
                       <VStack>
-                        <Text className="text-white font-bold text-lg">
+                        <Text className=" font-bold text-lg">
                           {item.classification}
                         </Text>
                         <HStack className="items-center">
                           <Box
-                            className={`w-2 h-2 rounded-full mr-1.5 ${item.confidence > 90 ? "bg-secondary" :
-                              item.confidence > 70 ? "bg-accent" :
-                                "bg-primary"
-                              }`}
+                            className={`w-2 h-2 rounded-full mr-1.5 ${
+                              item.confidence > 90
+                                ? "bg-secondary-500"
+                                : item.confidence > 70
+                                ? "bg-accent-500"
+                                : "bg-primary-500"
+                            }`}
                           />
-                          <Text className="text-white text-xs">
+                          <Text className="text-xs">
                             {item.confidence}% Confidence
                           </Text>
                         </HStack>
                       </VStack>
 
-                      <Button
-                        size="sm"
-                        style={{
-                          backgroundColor: 'rgba(255,255,255,0.2)',
-                          borderRadius: 8
-                        }}
-                      >
-                        <ButtonText className="text-white text-xs">Details</ButtonText>
+                      <Button size="sm" variant="link" className="mr-2">
+                        <ButtonText className=" text-xs">Details</ButtonText>
                       </Button>
                     </HStack>
                   </VStack>
@@ -280,9 +257,7 @@ export default function HomeScreen() {
                 >
                   <Icon as={GalleryHorizontal} className="" size={24} />
                 </Box>
-                <Text className="">
-                  No scan results yet
-                </Text>
+                <Text className="">No scan results yet</Text>
                 <Button className="bg-primary rounded-lg">
                   <ButtonIcon as={Camera} className="text-white" />
                   <ButtonText className="text-white">Start Scanning</ButtonText>

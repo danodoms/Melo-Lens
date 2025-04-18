@@ -25,7 +25,7 @@ export const AiPrompts: React.FC<AiPromptsProps> = ({
             onPress={() => onAiPrompt(prompt)}
             className="whitespace-nowrap justify-start bg-accent-0 px-4 rounded-full rounded-tl-none"
           >
-            <ButtonText className="text-background-0">{prompt}</ButtonText>
+            <ButtonText className="text-gray-900">{prompt}</ButtonText>
           </Button>
         ))}
       </HStack>

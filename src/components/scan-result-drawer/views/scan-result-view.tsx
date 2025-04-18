@@ -87,7 +87,7 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({
                 <Text className="mt-2 opacity-50 text-center">
                   {isXaiHeatmapShown
                     ? "Tap to view original Image"
-                    : "Tap to view XAI Heatmap"}
+                    : "Tap to view AI focus area"}
                 </Text>
               )}
             </Pressable>
@@ -103,7 +103,7 @@ export const ScanResultView: React.FC<ScanResultViewProps> = ({
 
             {hasResults && (
               <Button
-                className="gap-2 items-center mb-2 w-full mt-8 h-16 rounded-full border-accent-500 shadow-2xl border-4 shadow-accent-500 "
+                className="gap-2  items-center mb-2 w-full mt-8 h-16 rounded-full border-accent-500 shadow-sm border-4 shadow-accent-500 "
                 style={tw``}
                 variant="outline"
                 onPress={() => onAskAiAction()}

@@ -35,50 +35,7 @@ export async function getAiResponse(prompt: string) {
   }
 }
 
-export const getAiResponseStream = async (prompt, onData) => {
-  const response = await expoFetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Accept: "text/event-stream",
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model, // Adjust model if necessary
-        messages: [{ role: "user", content: prompt }],
-        stream: true,
-      }),
-      // redirect: "follow",
-    }
-  );
-
-  console.log("API KEY IS: ", API_KEY);
-  // console.log(`Bearer ${API_KEY}`);
-
-  console.log("RESPONSE: ", response);
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-
-  let done = false;
-  while (!done) {
-    const { value, done: readerDone } = await reader.read();
-    done = readerDone;
-    if (value) {
-      const chunk = decoder.decode(value);
-      console.log("CHUNK CHUNK: ", chunk);
-      onData(chunk); // Process each chunk of data
-    }
-  }
-};
-
-export async function getAiResponseStream2(prompt, onData) {
+export async function getAiResponseStream(prompt, onData) {
   // Track total accumulated content between throttled calls
   let accumulatedContent = "";
 
