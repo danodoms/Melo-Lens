@@ -3,4 +3,5 @@ export const melonDiseaseClasses = {
   "1": "Downy Mildew",
   "2": "Healthy",
   "3": "Mosaic Virus",
+  "4": "INVALID",
 };

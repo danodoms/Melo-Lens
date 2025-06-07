@@ -2,9 +2,17 @@ import { useState } from "react";
 import { TensorflowModel } from "react-native-fast-tflite";
 import { convertToRGB } from "react-native-image-to-rgb";
 
+type config = {
+  // Sets the predefined class name for the invalid output, ex. we have 4 classes ["DOG", "CAT", "BIRD", "NOT A PET"], whereas "NOT A PET" is treatead as the invalid class/label
+  invalidLabel: string;
+
+  // Action to take when the invalid label is detected
+  onInvalidLabelAction: () => void;
+};
+
 type imageDataType = "uint8" | "float32";
 
-export function useTfliteModel() {
+export function useTfliteModel({ invalidLabel, onInvalidLabelAction }: config) {
   // State for tracking if the model is currently predicting
   const [isModelPredicting, setIsModelPredicting] = useState(false);
 
@@ -131,6 +139,13 @@ export function useTfliteModel() {
     outputClasses: Record<any, any>
   ) => {
     const result = getMaxClassification(outputs, outputClasses);
+
+    if (invalidLabel === result.className) {
+      // Handle invalid label case
+      onInvalidLabelAction();
+      console.error("Invalid label detected:", result.className);
+      return;
+    }
 
     // Update states with the classification result and confidence
     setConfidence(Number((result.maxValue * 100).toFixed(2)));

@@ -28,6 +28,7 @@ import {
   Images,
   RefreshCw,
   SwitchCamera,
+  X,
 } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
@@ -40,6 +41,9 @@ import {
 } from "react-native-vision-camera";
 
 export default function ScanScreen() {
+  const { showToast } = useCustomToast();
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+
   const {
     confidence,
     classification,
@@ -50,7 +54,21 @@ export default function ScanScreen() {
     model,
     setModel,
     runModelPrediction,
-  } = useTfliteModel();
+  } = useTfliteModel({
+    invalidLabel: "INVALID",
+    onInvalidLabelAction: () => {
+      showToast({
+        title: "Error!",
+        message: "No leaf detected",
+        icon: X,
+        type: "error",
+        // actionLabel: "Close",
+        onActionPress: () => console.log("Closed"),
+      });
+
+      setDrawerOpen(false);
+    },
+  });
 
   const isOffline = useIsOffline();
 
@@ -63,12 +81,10 @@ export default function ScanScreen() {
   const [isResultSaved, setIsResultSaved] = useState<boolean>(false);
   const device = useCameraDevice(cameraFacing);
   const [isXaiEnabled, setXaiEnabled] = useState(false);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const backendAddress = use$(globalStore.backendAddress);
 
   const API_URL = `${backendAddress}/generate-heatmap/`;
-  const { showToast } = useCustomToast();
   const { addResult } = useSupaLegend();
   const syncLocalImagesToRemoteDatabase = useSupabase();
 
@@ -82,7 +98,7 @@ export default function ScanScreen() {
 
   const loadModel = async () => {
     const tfliteModel = await loadTensorflowModel(
-      require("@/assets/model/tflite/melon-disease/melon-disease-v3-224.tflite")
+      require("@/assets/model/tflite/melon-disease/melon-disease-v4-128.tflite")
     );
     setModel(tfliteModel);
   };
@@ -210,7 +226,7 @@ export default function ScanScreen() {
     // Resize the image to fit the model requirements
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       imageUri,
-      [{ resize: { width: 224, height: 224 } }],
+      [{ resize: { width: 128, height: 128 } }],
       { format: SaveFormat.JPEG, base64: true }
     );
     setCapturedImageUri(manipulatedImage.uri);
