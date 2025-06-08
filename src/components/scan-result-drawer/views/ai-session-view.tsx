@@ -12,17 +12,16 @@ import { VStack } from "@/src/components/ui/vstack";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 import { getAiResponseStream } from "@/src/lib/ai/fetch";
 import { FlashList } from "@shopify/flash-list";
-import { MoveLeft, Send, SendHorizonal, Sparkles } from "lucide-react-native";
+import { MoveLeft, SendHorizonal, Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
+import { Divider } from "../../ui/divider";
 import { HStack } from "../../ui/hstack";
 import { Icon } from "../../ui/icon";
 import { Textarea, TextareaInput } from "../../ui/textarea";
 import { AiPrompts } from "../components/ai-prompts";
-import { AiSession, DrawerState } from "./../types";
-import { type Message } from "./../types";
-import { Divider } from "../../ui/divider";
+import { AiSession, DrawerState, type Message } from "./../types";
 
 type AiSessionViewProps = {
   drawerState: DrawerState;
@@ -40,6 +39,8 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     responses: [],
     isGenerating: false,
   });
+
+  const [language, setLanguage] = useState<"en" | "fil" | "ceb">("en");
 
   // const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
   const [inputText, setInputText] = useState("");
@@ -78,12 +79,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     return messages;
   }
 
-  const handleAiPrompt = (prompt: string, usePrefix = true) => {
-    const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`;
-    const fullPrompt = usePrefix
-      ? `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable. Make it very concise and easy to understand.`
-      : prompt;
-
+  const handleAiPrompt = (prompt: string, fullPrompt: string) => {
     const newMessages = buildMessages(
       [...aiSession.prompts, fullPrompt],
       aiSession.responses,
@@ -194,9 +190,13 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
               <Text className="opacity-50">AI is generating...</Text>
             ) : (
               <AiPrompts
-                prompts={defaultPrompts}
-                onAiPromptPress={handleAiPrompt}
+                onAiPromptPress={(prompt, fullPrompt) =>
+                  handleAiPrompt(prompt, fullPrompt)
+                }
+                // language={language}
                 className="mt-4"
+                onLanguageChange={() => {}}
+                classification={drawerState.classification ?? ""}
               />
             )
           }
@@ -228,7 +228,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
             onChangeText={setInputText}
             onSubmitEditing={() => {
               if (inputText.trim()) {
-                handleAiPrompt(inputText.trim(), false);
+                handleAiPrompt(inputText.trim(), inputText.trim());
                 setInputText("");
               }
             }}
@@ -249,7 +249,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
           <Button
             onPress={() => {
               if (inputText.trim()) {
-                handleAiPrompt(inputText.trim(), false);
+                handleAiPrompt(inputText.trim(), inputText.trim());
                 setInputText("");
               }
             }}
