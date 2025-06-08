@@ -20,6 +20,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import { SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import {
+  BotOff,
   Brain,
   BrainCog,
   Check,
@@ -58,9 +59,10 @@ export default function ScanScreen() {
     invalidLabel: "INVALID",
     onInvalidLabelAction: () => {
       showToast({
-        title: "Error!",
+        id: "INVALID_ERROR",
+        title: "Error",
         message: "No leaf detected",
-        icon: X,
+        icon: BotOff,
         type: "error",
         // actionLabel: "Close",
         onActionPress: () => console.log("Closed"),
@@ -167,7 +169,8 @@ export default function ScanScreen() {
       onError: (error) => {
         console.error("XAI API Error:", error);
         showToast({
-          title: "XAI Error",
+          id: "AI_FOCUS_ERROR",
+          title: "AI Focus Error",
           message: error.message,
           icon: HelpCircle,
           type: "error",
@@ -206,12 +209,15 @@ export default function ScanScreen() {
       onError: (error) => {
         console.error("XAI API Error:", error);
         showToast({
-          title: "XAI Error",
+          id: "AI_FOCUS_ERROR",
+          title: "AI Focus Error",
           message: error.message,
           icon: HelpCircle,
           type: "error",
+          // actionLabel: "Close",
           onActionPress: () => console.log("Retry clicked"),
         });
+        setDrawerOpen(false);
       },
     });
   };
@@ -292,7 +298,8 @@ export default function ScanScreen() {
     setIsResultSaved(true);
 
     showToast({
-      title: "Success!",
+      id: "SAVE_RESULT",
+      title: "Success",
       message: "Result saved",
       icon: Check,
       type: "success",
