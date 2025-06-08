@@ -30,7 +30,7 @@ export const AiPrompts: React.FC<AiPromptsProps> = ({
             onPress={() => onAiPromptPress(prompt)}
             className="whitespace-nowrap justify-end bg-background-muted px-4 rounded-full rounded-br-md"
           >
-            <Icon as={BotMessageSquare} className="opacity-50"></Icon>
+            <Icon as={BotMessageSquare} className="opacity-70"></Icon>
             <ButtonText className="font-normal">{prompt}</ButtonText>
           </Button>
         ))}

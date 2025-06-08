@@ -15,3 +15,10 @@ export type AiSession = {
   prompts: string[];
   responses: string[];
 };
+
+export type Message = {
+  role: Role;
+  content: string;
+};
+
+type Role = "user" | "assistant";

@@ -11,27 +11,18 @@ import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 import { getAiResponseStream } from "@/src/lib/ai/fetch";
-import LottieView from "lottie-react-native";
-import {
-  ArrowUp,
-  MoveLeft,
-  MoveRight,
-  MoveUp,
-  SendHorizonal,
-  Sparkles,
-} from "lucide-react-native";
+import { FlashList } from "@shopify/flash-list";
+import { MoveLeft, Send, SendHorizonal, Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
-import { Center } from "../../ui/center";
 import { HStack } from "../../ui/hstack";
 import { Icon } from "../../ui/icon";
+import { Textarea, TextareaInput } from "../../ui/textarea";
 import { AiPrompts } from "../components/ai-prompts";
 import { AiSession, DrawerState } from "./../types";
-import { Textarea, TextareaInput } from "../../ui/textarea";
-import { Input, InputField } from "@/src/components/ui/input";
-import { FlashList } from "@shopify/flash-list";
-import { set } from "zod";
+import { type Message } from "./../types";
+import { Divider } from "../../ui/divider";
 
 type AiSessionViewProps = {
   drawerState: DrawerState;
@@ -66,11 +57,38 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     "What should be my first response?",
   ];
 
+  function buildMessages(
+    prompts: string[],
+    responses: string[],
+    limit: number
+  ): Message[] {
+    const messages: Message[] = [];
+
+    // Ensure we don’t go below zero
+    const start = Math.max(prompts.length - limit, 0);
+
+    for (let i = start; i < prompts.length; i++) {
+      messages.push({ role: "user", content: prompts[i] });
+
+      if (responses[i]) {
+        messages.push({ role: "assistant", content: responses[i] });
+      }
+    }
+
+    return messages;
+  }
+
   const handleAiPrompt = (prompt: string, usePrefix = true) => {
     const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`;
     const fullPrompt = usePrefix
       ? `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable. Make it very concise and easy to understand.`
       : prompt;
+
+    const newMessages = buildMessages(
+      [...aiSession.prompts, fullPrompt],
+      aiSession.responses,
+      5
+    );
 
     // Initialize the prompt and empty response, and set isGenerating to true
     setAiSession((prev) => ({
@@ -84,7 +102,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     let updated = false;
 
     getAiResponseStream(
-      fullPrompt,
+      newMessages,
       (chunk: string) => {
         responseBuffer.text += chunk;
 
@@ -145,19 +163,23 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
 
   return (
     <VStack className="h-full">
-      <DrawerHeader className="flex flex-wrap gap-2 items-center mt-4">
-        <VStack>
+      <DrawerHeader className="flex flex-wrap items-start mt-4 flex-col">
+        <HStack className="justify-between w-full">
           <HStack className="gap-2 items-center">
             <Icon as={Sparkles} className="text-primary-500" />
-            <Text className="font-bold text-2xl">Ask AI</Text>
+            <Heading className="font-bold">Ask AI</Heading>
           </HStack>
-          {/* <Heading size="lg">{aiSession.prompt}</Heading> */}
-        </VStack>
 
-        <Button onPress={onBack} className="rounded-full">
-          <ButtonIcon as={MoveLeft} />
-          <ButtonText>Back</ButtonText>
-        </Button>
+          <Button onPress={onBack} className="rounded-full">
+            <ButtonIcon as={MoveLeft} />
+            <ButtonText>Back</ButtonText>
+          </Button>
+        </HStack>
+
+        {/* <HStack className="justify-start opacity-50 font-medium items-center">
+          <Text className="font-medium">Classification - </Text>
+          <Text className="font-medium">{drawerState.classification}</Text>
+        </HStack> */}
       </DrawerHeader>
 
       <DrawerBody className="overflow-y-auto flex-1">
@@ -192,21 +214,16 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
         )} */}
       </DrawerBody>
 
-      <DrawerFooter className="">
+      <DrawerFooter className="flex flex-col bg-background-50 rounded-xl">
         <Textarea
           size="md"
           isReadOnly={false}
           isInvalid={false}
           isDisabled={false}
-          className="rounded-xl p-4"
+          className="rounded-xl px-4 border-none outline-none border-0"
         >
-          <Icon
-            as={Sparkles}
-            size="sm"
-            className="absolute top-4 right-4 opacity-70"
-          />
           <TextareaInput
-            placeholder="Ask anything"
+            placeholder={`Ask anything about ${drawerState.classification}`}
             value={inputText}
             onChangeText={setInputText}
             onSubmitEditing={() => {
@@ -218,6 +235,17 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
             // blurOnSubmit={true}
             returnKeyType="send"
           />
+        </Textarea>
+
+        <Divider />
+
+        <HStack className="flex justify-between w-full items-center p-4">
+          <HStack className="flex gap-1 items-center text-primary-500">
+            <Icon as={Sparkles} size="lg" className="mr-1 text-tertiary-500" />
+            <Text className="font-bold text-tertiary-500">Melo</Text>
+            <Text className="font-bold text-tertiary-500">Lens</Text>
+          </HStack>
+
           <Button
             onPress={() => {
               if (inputText.trim()) {
@@ -226,12 +254,12 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
               }
             }}
             disabled={aiSession.isGenerating}
-            className="mt-2 self-end rounded-full"
+            className="rounded-full"
           >
             <ButtonText>Send</ButtonText>
             <ButtonIcon as={SendHorizonal} />
           </Button>
-        </Textarea>
+        </HStack>
       </DrawerFooter>
     </VStack>
   );
