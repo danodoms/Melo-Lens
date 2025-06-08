@@ -12,6 +12,6 @@ export type DrawerState = {
 
 export type AiSession = {
   isGenerating: boolean;
-  prompt: string;
-  response: string;
+  prompts: string[];
+  responses: string[];
 };

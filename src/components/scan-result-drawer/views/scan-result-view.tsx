@@ -10,17 +10,14 @@ import { Skeleton, SkeletonText } from "@/src/components/ui/skeleton";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
 import LottieView from "lottie-react-native";
+import { Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
 import { Pressable, StyleSheet } from "react-native";
-import { AiPrompts } from "@/src/components/scan-result-drawer/components/ai-prompts";
-import { renderConfidenceRemark } from "../confidence-remark";
-import { renderSaveResultComponent } from "../components/save-result-button";
-import { AiSession, DrawerState } from "../types";
-import { Button, ButtonText, ButtonIcon } from "../../ui/button";
-import { HStack } from "../../ui/hstack";
-import { Icon } from "../../ui/icon";
-import { Sparkles } from "lucide-react-native";
 import tw from "twrnc";
+import { Button, ButtonIcon, ButtonText } from "../../ui/button";
+import { renderSaveResultComponent } from "../components/save-result-button";
+import { renderConfidenceRemark } from "../confidence-remark";
+import { DrawerState } from "../types";
 
 type ScanResultViewProps = {
   drawerState: DrawerState;

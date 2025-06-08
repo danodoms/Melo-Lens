@@ -1,31 +1,37 @@
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { HStack } from "@/src/components/ui/hstack";
-import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
-import { Sparkles } from "lucide-react-native";
 import React from "react";
-import { Icon } from "@/src/components/ui/icon";
+import { Text } from "../../ui/text";
+import { Icon } from "../../ui/icon";
+import { BotMessageSquare } from "lucide-react-native";
 
 type AiPromptsProps = {
   prompts: string[];
-  onAiPrompt: (prompt: string) => void;
+  onAiPromptPress: (prompt: string) => void;
+  className?: string;
 };
 
 export const AiPrompts: React.FC<AiPromptsProps> = ({
   prompts,
-  onAiPrompt,
+  onAiPromptPress,
+  className,
 }) => {
   return (
-    <VStack className="w-full mt-8">
-      <HStack className="max-h-64 flex-wrap gap-2 pb-16 overflow-y-auto">
+    <VStack className={`w-full ${className} `}>
+      <Text className="text-right w-full py-2 font-medium opacity-50">
+        Select a prompt
+      </Text>
+      <HStack className="flex-wrap gap-1 justify-end">
         {prompts.map((prompt, index) => (
           <Button
             variant="link"
             key={prompt + index}
-            onPress={() => onAiPrompt(prompt)}
-            className="whitespace-nowrap justify-start bg-accent-0 px-4 rounded-full rounded-tl-none"
+            onPress={() => onAiPromptPress(prompt)}
+            className="whitespace-nowrap justify-end bg-background-muted px-4 rounded-full rounded-br-md"
           >
-            <ButtonText className="text-gray-900">{prompt}</ButtonText>
+            <Icon as={BotMessageSquare} className="opacity-50"></Icon>
+            <ButtonText className="font-normal">{prompt}</ButtonText>
           </Button>
         ))}
       </HStack>

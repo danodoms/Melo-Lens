@@ -19,7 +19,7 @@ const ScanResultDrawer: React.FC<ScanResultDrawerProps> = ({ drawerState }) => {
     <Drawer
       isOpen={drawerState.isDrawerOpen}
       onClose={() => drawerState.setDrawerOpen(false)}
-      size="lg"
+      size={isAiPageShown ? "full" : "lg"}
       anchor="bottom"
     >
       <DrawerBackdrop />

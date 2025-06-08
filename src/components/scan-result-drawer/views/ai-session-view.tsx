@@ -1,7 +1,11 @@
 import { Colors } from "@/constants/Colors";
 import { Box } from "@/src/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/src/components/ui/button";
-import { DrawerBody, DrawerHeader } from "@/src/components/ui/drawer";
+import {
+  DrawerBody,
+  DrawerFooter,
+  DrawerHeader,
+} from "@/src/components/ui/drawer";
 import { Heading } from "@/src/components/ui/heading";
 import { Text } from "@/src/components/ui/text";
 import { VStack } from "@/src/components/ui/vstack";
@@ -17,6 +21,10 @@ import { HStack } from "../../ui/hstack";
 import { Icon } from "../../ui/icon";
 import { AiPrompts } from "../components/ai-prompts";
 import { AiSession, DrawerState } from "./../types";
+import { Textarea, TextareaInput } from "../../ui/textarea";
+import { Input, InputField } from "@/src/components/ui/input";
+import { FlashList } from "@shopify/flash-list";
+import { set } from "zod";
 
 type AiSessionViewProps = {
   drawerState: DrawerState;
@@ -30,12 +38,18 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
   const colorScheme = useColorScheme();
 
   const [aiSession, setAiSession] = useState<AiSession>({
-    prompt: "Select a prompt",
-    response: "",
+    // prompts: ["Hi there", "Cool, good to know", "What about others"],
+    // responses: [
+    //   "Yes Correct",
+    //   "How may I help you?",
+    //   "What else can I assist you with?",
+    // ],
+    prompts: [],
+    responses: [],
     isGenerating: false,
   });
 
-  const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
+  // const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
 
   const defaultPrompts = [
     "What treatments work best for this?",
@@ -52,59 +66,111 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
 
   const handleAiPrompt = (prompt: string) => {
     const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`;
-    const fullPrompt = `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable.`;
-    console.log("sdjsadjksdsas");
+    const fullPrompt = `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable. Make it very concise and easy to understand.`;
 
-    setAiSession({
-      prompt,
-      response: "Generating response...",
+    setAiSession((prev) => ({
+      ...prev,
+      prompts: [...prev.prompts, prompt],
+      responses: [...prev.responses, ""], // reserve space
       isGenerating: true,
+    }));
+
+    const responseBuffer = { text: "" };
+    let updated = false;
+
+    getAiResponseStream(fullPrompt, (chunk: string) => {
+      responseBuffer.text += chunk;
+
+      if (!updated) {
+        updated = true;
+        requestAnimationFrame(() => {
+          setAiSession((prev) => {
+            const responses = [...prev.responses];
+            responses[responses.length - 1] = responseBuffer.text;
+
+            return {
+              ...prev,
+              responses,
+            };
+          });
+          updated = false;
+        });
+      }
     });
 
-    setShowPrompts(false); // HIDE PROMPTS when starting generation
-
-    let responseStream = "";
-
-    getAiResponseStream(fullPrompt, (chunk: string) =>
-      setAiSession({
-        prompt,
-        response: (responseStream += chunk),
-        isGenerating: false,
-      })
-    );
-  };
-
-  const resetSession = () => {
-    setAiSession({
-      prompt: "Select a prompt",
-      response: "",
+    setAiSession((prev) => ({
+      ...prev,
       isGenerating: false,
-    });
-    setShowPrompts(true);
+    }));
   };
+
+  const messageList = aiSession.prompts.map((prompt, index) => ({
+    id: `pair-${index}`,
+    prompt,
+    response: aiSession.responses[index],
+  }));
+
+  const renderChatItem = ({ item }: { item: (typeof messageList)[number] }) => (
+    <React.Fragment key={item.id}>
+      <Box className="whitespace-nowrap justify-end bg-background-muted flex-1 py-2 px-4 rounded-full my-2 rounded-br-md self-end">
+        <Text className="font-normal text-right">{item.prompt}</Text>
+      </Box>
+
+      {item.response && (
+        <Box className="w-full my-2 rounded-md border-gray-300 text-primary-500 self-start">
+          <Markdown
+            style={{
+              body: {
+                fontSize: 14,
+                color: Colors[colorScheme ?? "light"].tint,
+              },
+            }}
+          >
+            {item.response}
+          </Markdown>
+        </Box>
+      )}
+    </React.Fragment>
+  );
 
   return (
-    <>
-      <DrawerHeader className="flex flex-wrap gap-2 items-center">
+    <VStack className="h-full">
+      <DrawerHeader className="flex flex-wrap gap-2 items-center mt-4">
         <VStack>
-          <HStack className="gap-2 items-center opacity-50">
+          <HStack className="gap-2 items-center">
             <Icon as={Sparkles} className="text-primary-500" />
-            <Text className="font-bold">Ask AI</Text>
+            <Text className="font-bold text-2xl">Ask AI</Text>
           </HStack>
-
-          <Heading size="lg">{aiSession.prompt}</Heading>
+          {/* <Heading size="lg">{aiSession.prompt}</Heading> */}
         </VStack>
 
-        <Button onPress={onBack}>
+        <Button onPress={onBack} className="rounded-full">
           <ButtonIcon as={MoveLeft} />
           <ButtonText>Back</ButtonText>
         </Button>
       </DrawerHeader>
 
-      <DrawerBody className="overflow-auto">
-        {showPrompts ? (
-          <AiPrompts prompts={defaultPrompts} onAiPrompt={handleAiPrompt} />
-        ) : aiSession.isGenerating ? (
+      <DrawerBody className="overflow-y-auto flex-1">
+        <FlashList
+          data={messageList}
+          keyExtractor={(item) => item.id}
+          renderItem={renderChatItem}
+          estimatedItemSize={100}
+          contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 16 }}
+          ListFooterComponent={
+            aiSession.isGenerating ? (
+              <Text className="">AI is generating...</Text>
+            ) : (
+              <AiPrompts
+                prompts={defaultPrompts}
+                onAiPromptPress={handleAiPrompt}
+                className="mt-4"
+              />
+            )
+          }
+        />
+
+        {/* {aiSession.isGenerating && (
           <Center className="h-96">
             <LottieView
               style={styles.animation}
@@ -113,32 +179,37 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
               loop
             />
           </Center>
-        ) : (
-          <>
-            <Box className="mt-4 w-full rounded-md border-gray-300 text-primary-500">
-              <Markdown
-                style={{
-                  body: {
-                    fontSize: 14,
-                    color: Colors[colorScheme ?? "light"].tint,
-                  },
-                }}
-              >
-                {aiSession.response.trim()}
-              </Markdown>
-            </Box>
-
-            <Button
-              onPress={resetSession}
-              className="mt-4 self-start bg-primary-500"
-            >
-              <ButtonIcon as={Sparkles} />
-              <ButtonText>Ask Again</ButtonText>
-            </Button>
-          </>
-        )}
+        )} */}
       </DrawerBody>
-    </>
+
+      <DrawerFooter className="">
+        <Textarea
+          size="md"
+          isReadOnly={false}
+          isInvalid={false}
+          isDisabled={false}
+          className="rounded-xl p-4"
+        >
+          <Icon
+            as={Sparkles}
+            size="sm"
+            className="absolute top-4 right-4 opacity-70"
+          />
+          <TextareaInput placeholder="Ask anything" />
+        </Textarea>
+
+        {/* <Input
+          variant="rounded"
+          size="md"
+          isDisabled={false}
+          isInvalid={false}
+          isReadOnly={false}
+          className="w-full"
+        >
+          <InputField placeholder="Ask anything" />
+        </Input> */}
+      </DrawerFooter>
+    </VStack>
   );
 };
 
