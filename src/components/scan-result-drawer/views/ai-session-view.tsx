@@ -12,7 +12,14 @@ import { VStack } from "@/src/components/ui/vstack";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 import { getAiResponseStream } from "@/src/lib/ai/fetch";
 import LottieView from "lottie-react-native";
-import { MoveLeft, Sparkles } from "lucide-react-native";
+import {
+  ArrowUp,
+  MoveLeft,
+  MoveRight,
+  MoveUp,
+  SendHorizonal,
+  Sparkles,
+} from "lucide-react-native";
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
@@ -38,18 +45,13 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
   const colorScheme = useColorScheme();
 
   const [aiSession, setAiSession] = useState<AiSession>({
-    // prompts: ["Hi there", "Cool, good to know", "What about others"],
-    // responses: [
-    //   "Yes Correct",
-    //   "How may I help you?",
-    //   "What else can I assist you with?",
-    // ],
     prompts: [],
     responses: [],
     isGenerating: false,
   });
 
   // const [showPrompts, setShowPrompts] = useState(true); // NEW STATE
+  const [inputText, setInputText] = useState("");
 
   const defaultPrompts = [
     "What treatments work best for this?",
@@ -64,44 +66,52 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
     "What should be my first response?",
   ];
 
-  const handleAiPrompt = (prompt: string) => {
+  const handleAiPrompt = (prompt: string, usePrefix = true) => {
     const promptPrefix = `You are an expert in plant pathology. Given that the user classified their watermelon as having "${drawerState.classification}", provide insights on symptoms, causes, and management strategies. Avoid giving medical or veterinary advice.`;
-    const fullPrompt = `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable. Make it very concise and easy to understand.`;
+    const fullPrompt = usePrefix
+      ? `${promptPrefix} ${prompt}. Include specific symptoms, causes, treatments, and preventive measures. Keep the response clear and actionable. Make it very concise and easy to understand.`
+      : prompt;
 
+    // Initialize the prompt and empty response, and set isGenerating to true
     setAiSession((prev) => ({
       ...prev,
       prompts: [...prev.prompts, prompt],
-      responses: [...prev.responses, ""], // reserve space
+      responses: [...prev.responses, ""],
       isGenerating: true,
     }));
 
     const responseBuffer = { text: "" };
     let updated = false;
 
-    getAiResponseStream(fullPrompt, (chunk: string) => {
-      responseBuffer.text += chunk;
+    getAiResponseStream(
+      fullPrompt,
+      (chunk: string) => {
+        responseBuffer.text += chunk;
 
-      if (!updated) {
-        updated = true;
-        requestAnimationFrame(() => {
-          setAiSession((prev) => {
-            const responses = [...prev.responses];
-            responses[responses.length - 1] = responseBuffer.text;
+        if (!updated) {
+          updated = true;
+          requestAnimationFrame(() => {
+            setAiSession((prev) => {
+              const responses = [...prev.responses];
+              responses[responses.length - 1] = responseBuffer.text;
 
-            return {
-              ...prev,
-              responses,
-            };
+              return {
+                ...prev,
+                responses,
+              };
+            });
+            updated = false;
           });
-          updated = false;
-        });
+        }
+      },
+      () => {
+        // Called when stream is finished
+        setAiSession((prev) => ({
+          ...prev,
+          isGenerating: false,
+        }));
       }
-    });
-
-    setAiSession((prev) => ({
-      ...prev,
-      isGenerating: false,
-    }));
+    );
   };
 
   const messageList = aiSession.prompts.map((prompt, index) => ({
@@ -159,7 +169,7 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
           contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 16 }}
           ListFooterComponent={
             aiSession.isGenerating ? (
-              <Text className="">AI is generating...</Text>
+              <Text className="opacity-50">AI is generating...</Text>
             ) : (
               <AiPrompts
                 prompts={defaultPrompts}
@@ -195,19 +205,33 @@ export const AiSessionView: React.FC<AiSessionViewProps> = ({
             size="sm"
             className="absolute top-4 right-4 opacity-70"
           />
-          <TextareaInput placeholder="Ask anything" />
+          <TextareaInput
+            placeholder="Ask anything"
+            value={inputText}
+            onChangeText={setInputText}
+            onSubmitEditing={() => {
+              if (inputText.trim()) {
+                handleAiPrompt(inputText.trim(), false);
+                setInputText("");
+              }
+            }}
+            // blurOnSubmit={true}
+            returnKeyType="send"
+          />
+          <Button
+            onPress={() => {
+              if (inputText.trim()) {
+                handleAiPrompt(inputText.trim(), false);
+                setInputText("");
+              }
+            }}
+            disabled={aiSession.isGenerating}
+            className="mt-2 self-end rounded-full"
+          >
+            <ButtonText>Send</ButtonText>
+            <ButtonIcon as={SendHorizonal} />
+          </Button>
         </Textarea>
-
-        {/* <Input
-          variant="rounded"
-          size="md"
-          isDisabled={false}
-          isInvalid={false}
-          isReadOnly={false}
-          className="w-full"
-        >
-          <InputField placeholder="Ask anything" />
-        </Input> */}
       </DrawerFooter>
     </VStack>
   );

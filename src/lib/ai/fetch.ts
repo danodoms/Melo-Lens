@@ -35,7 +35,7 @@ export async function getAiResponse(prompt: string) {
   }
 }
 
-export async function getAiResponseStream(prompt, onData) {
+export async function getAiResponseStream(prompt, onData, onDone: () => void) {
   // Track total accumulated content between throttled calls
   let accumulatedContent = "";
 
@@ -111,6 +111,9 @@ export async function getAiResponseStream(prompt, onData) {
     if (accumulatedContent) {
       throttledOnData.flush();
     }
+
+    // Final fallback in case [DONE] wasn't caught properly
+    onDone?.();
   } finally {
     reader.cancel();
   }
